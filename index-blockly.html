@@ -1,0 +1,35 @@
+<head>
+  <meta charset="utf-8"/>
+  <script src="blockly_compressed.min.js"></script>
+  <script src="blocks_compressed.min.js"></script>
+  <script src="javascript_compressed.min.js"></script>
+  <script src="ja.min.js"></script>             <!-- 日本語化 -->
+  <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
+  <script src="CustomBlocksJson.js"></script>
+  <script src="CustomBlocksJavascript.js"></script>
+  <title>Blockly Sample</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="blocklyArea">
+    <div id="blocklyDiv" style="position: absolute"></div>
+  </div>
+
+</div>
+  <xml id="toolbox" style="display: none">
+    <block type="logic_compare"></block>
+    <block type="logic_operation"></block>
+    <block type="logic_boolean"></block>
+    <block type="math_number"></block>
+    <block type="math_arithmetic"></block>
+    <block type="text"></block>
+    <block type="if_else"></block>
+    <block type="if"></block>
+    <block type="output"></block>
+  </xml>
+  <div id="codebox" contenteditable=true></div>
+  <button id="execution">実行</button>
+  <button id="consoleclear">クリア</button>
+  <div id="codeoutput" contenteditable=true></div>
+  <script src="script-blockly.js"></script>
+</body>
