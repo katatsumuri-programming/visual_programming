@@ -1,9 +1,9 @@
 <head>
   <meta charset="utf-8"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.2.0/blockly.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.2.0/blockly.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.2.0/blocks.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.2.0/javascript.min.js"></script>
-  <!-- <script src="https://unpkg.com/blockly/blockly.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.2.0/javascript.min.js"></script> -->
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <!-- <script src="blockly.min.js"></script>
   <script src="blocks.min.js"></script>
   <script src="javascript.min.js"></script> -->
@@ -76,12 +76,15 @@
                 <input type="checkbox" id="auto_code_create" name="auto_code_create" checked><label for="auto_code_create">自動でコードを生成</label>
               </p></li>
               <li class="dropdown_list"><p id="create_code">ブロックをコードに反映</p></li>
-              <hr>
+              <!-- <hr>
               <li class="dropdown_list"><p>
                 <input type="checkbox" id="auto_block_create" name="auto_block_create"><label for="auto_block_create">自動でブロックを生成</label>
-              </p></li>
-              <li class="dropdown_list"><p id="create_block">コードをブロックに反映</p></li>
+              </p></li> -->
+              <!-- <li class="dropdown_list"><p id="create_block">コードをブロックに反映</p></li> -->
             </ul>
+          </li>
+          <li class="menu_list">
+            <p id="create_block">コードをブロックに反映</p>
           </li>
       </ul>
     </div>
@@ -531,6 +534,16 @@
         <button id="open_dialog_newfile">新しいプロジェクトを作成</button>
         <button id="open">開く</button>
         <button id="cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+  <div id="error_dialog_background">
+    <div id="error_dialog">
+      <h2>ブロックに変換できませんでした</h2>
+      <p>エラー内容</p>
+      <textarea id="error_text"></textarea>
+      <div class="buttons">
+        <button id="close">閉じる</button>
       </div>
     </div>
   </div>

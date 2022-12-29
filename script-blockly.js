@@ -3,8 +3,10 @@ var welcome = false;
 var project_name = "";
 var myInterpreter;
 var play = false;
-var code_block_generate = false;
+var last_workspace_xml;
+// var code_block_generate = false;
 $("#open_dialog_background").css("display", "none");
+$("#error_dialog_background").css("display", "none");
 Blockly.HSV_SATURATION = 0.9;
 Blockly.HSV_VALUE = 0.7;
 Blockly.Flyout.prototype.autoClose=false;
@@ -34,15 +36,15 @@ var workspace = Blockly.inject('blocklyArea',
 workspace.addChangeListener(function() {
     save = false;
     if ($("#auto_code_create").prop('checked')) {
-        if  (code_block_generate == false) {
-            code_block_generate = true;
+        // if  (code_block_generate == false) {
+            // code_block_generate = true;
             const code = Blockly.JavaScript.workspaceToCode(workspace);
 
             var doc = editor.getDoc();
             doc.setValue(code);
             editor.save();
-            code_block_generate = false;
-        } 
+            // code_block_generate = false;
+        // }
     }
     if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled")) {
         var xml = Blockly.Xml.workspaceToDom(workspace);
@@ -73,10 +75,24 @@ $("#create_code").click(function () {
     editor.save();
 });
 $("#create_block").click(function () {
-    var code = editor.getValue();
-    var xml = parseCode(code);
-    workspace.clear()
-    Blockly.Xml.appendDomToWorkspace(xml, workspace)
+    try {
+        var code = editor.getValue();
+        var xml = parseCode(code);
+        last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
+        workspace.clear()
+        Blockly.Xml.appendDomToWorkspace(xml, workspace)
+    } catch (error) {
+        console.log(error)
+        if (!(error == "TypeError: Next block does not have previous statement.")) {
+            $("#error_text").val(error)
+            $("#error_dialog_background").css("display", "block");
+        } else {
+            $("#error_text").val("無効な命令があります")
+            $("#error_dialog_background").css("display", "block");
+            workspace.clear()
+            Blockly.Xml.appendDomToWorkspace(last_workspace_xml, workspace)
+        }
+    }
 });
 
 
@@ -207,22 +223,23 @@ var output_eval = CodeMirror.fromTextArea(document.getElementById("codeoutput"),
 output_eval.setSize("50%", "calc(50% - 50px)");
 output_eval.save();
 
-editor.on("change", function (e) {
-    if (code_block_generate == false) {
-        
-        code_block_generate = true;
-        var code = editor.getValue();
-        try {
-            var xml = parseCode(code);
-            workspace.clear()
-            Blockly.Xml.appendDomToWorkspace(xml, workspace)
-        } catch (error) {}
-        
-        
-        
-        code_block_generate = false;
-    }
-})
+// editor.on("change", function (e) {
+//     console.log(e)
+//     if (code_block_generate == false) {
+
+//         code_block_generate = true;
+//         var code = editor.getValue();
+//         try {
+//             var xml = parseCode(code);
+//             workspace.clear()
+//             Blockly.Xml.appendDomToWorkspace(xml, workspace)
+//         } catch (error) {}
+
+
+
+//         code_block_generate = false;
+//     }
+// })
 
 $("#file_menu").click(function() {
     $('#edit_dropdown').css('display', 'none');
@@ -380,6 +397,9 @@ $("#load_browser").click(function() {
         $("#open_dialog_background").css("display", "block");
 
     }
+})
+$("#close").click(function() {
+    $("#error_dialog_background").css("display", "none");
 })
 
 $("#cancel").click(function() {

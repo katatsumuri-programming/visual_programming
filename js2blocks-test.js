@@ -47,7 +47,7 @@
 //var tokens = [];
 //var out1 = document.getElementById("out1");
 goog.require('goog.dom');
-var debug = true;
+var debug = false;
 
 //var outln = function(msg){
 //  out1.innerHTML += msg+'<br>';
@@ -391,7 +391,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
   comments = comments || []
   var last_comment = 0
   options.joinTopBlocks = options.joinTopBlocks || false
-  
+
 //   var goog = window.Blockly.goog;
 
   //var xml = ['xml'];
@@ -410,11 +410,11 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     var block1
     if(name === 'block'){
       block_loc[id] = ast_node.loc
-      console.log(id+' '+ast_node.loc.start.line);
+      if(debug) console.log(id+' '+ast_node.loc.start.line);
       attrs.id = id;
       id += 1;
       block1 = goog.dom.createDom('block');
-      
+
       let comm1
       let first = true
       let i = last_comment
@@ -432,7 +432,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       }
       last_comment = i
     } else {
-      block1 = goog.dom.createDom(name);      
+      block1 = goog.dom.createDom(name);
     }
     for(var key in attrs){
       block1.setAttribute(key, attrs[key]);
@@ -440,8 +440,8 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if(text) block1.append(text);
     return block1;
   };
-    
-  // Based on acornjs walk.js recursive parser: 
+
+  // Based on acornjs walk.js recursive parser:
   //var skipThrough = function(node, st, c) { c(node, st) }
   var ignore = function(_node, _st, _c) {}
 
@@ -453,20 +453,23 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if(debug) console.log("Statement");
     c(node, st)
     if(current_node.children.length > 0){
-      console.log(expression_statement)
-      console.log(current_node.children)
-      if  (!expression_statement) {
-        var next1 = newNode('next');
-        current_node.children[0].appendChild(next1);
-        current_node = next1;
-      
-      } else {
-        
-      let lastChild = current_node.children.length
-      console.log(current_node.children[0].next);
-      current_node.children[lastChild-1].setAttribute('x', '0');
-      current_node.children[lastChild-1].setAttribute('y', (lastChild*100).toString());
-      }
+      // console.log(root_node)
+      // console.log(root_node.children)
+      var next1 = newNode('next');
+      current_node.children[0].appendChild(next1);
+      current_node = next1;
+      // if  (!expression_statement) {
+      //   var next1 = newNode('next');
+      //   current_node.children[0].appendChild(next1);
+      //   current_node = next1;
+
+      // } else {
+
+      // let lastChild = root_node.children.length
+      // console.log(root_node.children[0]);
+      // root_node.children[lastChild].setAttribute('x', '0');
+      // root_node.children[lastChild].setAttribute('y', (lastChild*100).toString());
+      // }
     }
     // if(!options.joinTopBlocks && current_node === root_node ){
     //   let lastChild = current_node.children.length
@@ -487,8 +490,8 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     expression_statement = true;
     c(node.expression, st, "Expression")
   }
-  funcs.ParenthesizedExpression = (node, st, c) => { 
-    if(debug) console.log("ParenthesizedExpression");  
+  funcs.ParenthesizedExpression = (node, st, c) => {
+    if(debug) console.log("ParenthesizedExpression");
     c(node.expression, st, "Expression")
   }
   funcs.IfStatement = (node, st, c) => {
@@ -511,7 +514,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if (node.alternate){
       var statement2 = newNode('statement', {name:'ELSE'});
       block1.appendChild(statement2);
-      current_node = statement2;      
+      current_node = statement2;
       c(node.alternate, st, "Statement")
     }
     current_node = node1;
@@ -528,7 +531,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
   funcs.ContinueStatement = function(node, st, c) {
     if(debug) console.log("BreakStatement");
     var block1 = newNode('block',{type:'bi_continue'}, '', node)
-    current_node.appendChild(block1)  
+    current_node.appendChild(block1)
   } // ignore
   funcs.WithStatement = (node, st, c) => {
     if(debug) console.log("WithStatement");
@@ -574,12 +577,12 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       current_node = default1
       let cs = node.cases[node.cases.length-1]
       for (let j = 0; j < cs.consequent.length; ++j)
-        c(cs.consequent[j], st, "Statement")      
+        c(cs.consequent[j], st, "Statement")
     }
     current_node = node1
   }
   funcs.ReturnStatement = (node, st, c) => {
-    if(debug) console.log("ReturnStatement");    
+    if(debug) console.log("ReturnStatement");
     var block1 = newNode('block', {type:'bi_return'}, '', node);
     var value1 = newNode('value', {name:'ret'});
     block1.appendChild(value1);
@@ -596,7 +599,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if(node.delegate){
       delegate1 = newNode('field', {name:'delegate'}, 'TRUE')
     } else{
-      delegate1 = newNode('field', {name:'delegate'}, 'FALSE')      
+      delegate1 = newNode('field', {name:'delegate'}, 'FALSE')
     }
     if(expression_statement){
       expression_statement = false;
@@ -609,13 +612,13 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     block1.appendChild(value1);
     current_node.appendChild(block1);
     var node1 = current_node;
-    current_node = value1;    
-    if (node.argument) c(node.argument, st, "Expression")    
+    current_node = value1;
+    if (node.argument) c(node.argument, st, "Expression")
     current_node = node1;
   }
   funcs.AwaitExpression = (node, st, c) => {
     if(debug) console.log("AwaitExpression");
-    if (node.argument) c(node.argument, st, "Expression")    
+    if (node.argument) c(node.argument, st, "Expression")
   }
   funcs.ThrowStatement =
     (node, st, c) => {
@@ -678,13 +681,13 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     var mode1 = newNode('field', {name:'MODE'}, 'WHILE')
     block1.appendChild(mode1)
     var test1 = newNode('value', {name:'BOOL'})
-    block1.appendChild(test1)    
+    block1.appendChild(test1)
     var node1 = current_node;
-    current_node = test1;    
+    current_node = test1;
     c(node.test, st, "Expression")
     var body1 = newNode('statement', {name:'DO'})
-    block1.appendChild(body1)    
-    current_node = body1;        
+    block1.appendChild(body1)
+    current_node = body1;
     c(node.body, st, "Statement")
     current_node = node1
   }
@@ -699,7 +702,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if (node.init) c(node.init, st, "ForInit")
     var test1 = newNode('value', {name:'test'});
     block1.appendChild(test1);
-    current_node = test1;    
+    current_node = test1;
     if (node.test) c(node.test, st, "Expression")
     var update1 = newNode('statement', {name:'update'});
     block1.appendChild(update1);
@@ -709,7 +712,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     //if (node.update) c(node.update, st, "Statement")
     var statement1 = newNode('statement', {name:'chain'});
     block1.appendChild(statement1);
-    current_node = statement1;    
+    current_node = statement1;
     c(node.body, st, "Statement")
     current_node = node1;
   }
@@ -725,11 +728,11 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     var array1 = newNode('value', {name:'array'});
     block1.appendChild(array1);
     var node1 = current_node;
-    current_node = array1;        
+    current_node = array1;
     c(node.right, st, "Expression")
     var statement1 = newNode('statement', {name:'chain'});
     block1.appendChild(statement1);
-    current_node = statement1;    
+    current_node = statement1;
     c(node.body, st, "Statement")
     current_node = node1;
   }
@@ -739,12 +742,12 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if (node.type === "VariableDeclaration"){
       c(node, st)
     }
-    //    else { 
+    //    else {
     //      c(node, st, "Statement")
     //    }
     else {
       expression_statement = true;
-      c(node, st, "Expression") 
+      c(node, st, "Expression")
     }
     for_init = false;
   }
@@ -777,12 +780,12 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         current_node.appendChild(block1);
         var field1 = newNode('field', {name:'OP'}, '=');
         block1.appendChild(field1);
-        var left = newNode('value', {name:'A'});    
+        var left = newNode('value', {name:'A'});
         block1.appendChild(left);
         var node1 = current_node;
         current_node = left;
         c(node.id, st, "Pattern")
-        var right = newNode('value', {name:'B'});    
+        var right = newNode('value', {name:'B'});
         block1.appendChild(right);
         current_node = right;
 
@@ -798,7 +801,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         current_node.appendChild(block1);
         current_node = value1;
         if (node.init) c(node.init, st, "Expression")
-        current_node = node1;        
+        current_node = node1;
       }
     }
     else {
@@ -830,7 +833,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if(node.generator){
       generator1 = newNode('field', {name:'function_type'}, 'function* ')
     } else{
-      generator1 = newNode('field', {name:'function_type'}, 'function ')      
+      generator1 = newNode('field', {name:'function_type'}, 'function ')
     }
     //console.log(expression_statement)
     if(node.id){
@@ -846,9 +849,9 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     } else if(node.method){
       block1 = newNode('block', {type:'bi_function'}, '', node);
       block1.appendChild(newNode('field', {name:'function_type'}, ''));
-      block1.appendChild(newNode('field', {name:'name'}, node.method));      
+      block1.appendChild(newNode('field', {name:'name'}, node.method));
     } else{
-      block1 = newNode('block', {type:'bi_function_return'}, '', node);      
+      block1 = newNode('block', {type:'bi_function_return'}, '', node);
       block1.appendChild(generator1)
       block1.appendChild(newNode('field', {name:'name'}, ''));
     }
@@ -871,7 +874,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
   // (They are awkward, and in ES6 every block can be a scope.)
   //funcs.ScopeBody = (node, st, c) => c(node, st, "Statement")
   //funcs.ScopeExpression = (node, st, c) => c(node, st, "Expression")
-  
+
   funcs.Pattern = function(node, st, c){
     if(debug) console.log("Pattern "+node.type);
     if (node.type === "Identifier"){
@@ -897,7 +900,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     block1.appendChild(newNode('field',{name:'NAME'},node.name));
     current_node.appendChild(block1);
   }; // ignore
-  funcs.MemberPattern = function(node, st, c) { 
+  funcs.MemberPattern = function(node, st, c) {
     if(debug) console.log("MemberPattern");
     c(node, st)
   }; // skipTrough
@@ -915,9 +918,9 @@ base.MethodDefinition = base.Property = (node, st, c) => {
   funcs.ObjectPattern = (node, st, c) => {
     if(debug) console.log("ObjectPattern");
     for (let i = 0; i < node.properties.length; ++i)
-      c(node.properties[i].value, st, "Pattern") 
+      c(node.properties[i].value, st, "Pattern")
   }
-  funcs.Expression = function(node, st, c) { 
+  funcs.Expression = function(node, st, c) {
     c(node, st)
   }; // skipTrough()
   funcs.ThisExpression = function(node, st, c) {
@@ -956,7 +959,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       block1.appendChild(value1);
       current_path_chain.push(value1);
       current_node.appendChild(block1);
-    }    
+    }
   }; // ignore
   funcs.MetaProperty = function(node, st, c) {
     if(debug) console.log("MetaProperty");
@@ -965,11 +968,11 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     if(debug) console.log("ArrayExpression");
     var block1 = newNode('block',{type:'lists_create_with'}, '', node);
     current_node.appendChild(block1);
-    var mutation1 = newNode('mutation',{items:node.elements.length+1}); // TODO: Take out the +1 when list items number is corrected on core/blocks.js AddSub...
+    var mutation1 = newNode('mutation',{items:node.elements.length}); // TODO: Take out the +1 when list items number is corrected on core/blocks.js AddSub...
     block1.appendChild(mutation1);
     var node1 = current_node;
     for (let i = 0; i < node.elements.length; ++i) {
-      let element1 = newNode('value',{name:'items'+(i+1)});
+      let element1 = newNode('value',{name:'ADD'+i});
       block1.appendChild(element1);
       current_node = element1;
       let elt = node.elements[i]
@@ -982,7 +985,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     var block1 = newNode('block',{type:'maps_create_with'}, '', node);
     current_node.appendChild(block1);
     var mutation1 = newNode('mutation',{items:node.properties.length+1}); // TODO: Take out the +1 when list items number is corrected on core/blocks.js AddSub...
-    block1.appendChild(mutation1);    
+    block1.appendChild(mutation1);
     var node1 = current_node;
     for (let i = 0; i < node.properties.length; ++i){
       let property1 = newNode('value',{name:'ADD'+(i+1)});
@@ -1018,20 +1021,20 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       if(node.prefix){
         block1 = newNode('block', {type:'bi_unary'}, '', node);
       } else {
-        block1 = newNode('block', {type:'bi_unary_postfix'}, '', node);        
+        block1 = newNode('block', {type:'bi_unary_postfix'}, '', node);
       }
     } else{
       if(node.prefix){
         block1 = newNode('block', {type:'bi_unary_return'}, '', node);
       } else {
-        block1 = newNode('block', {type:'bi_unary_postfix_return'}, '', node);        
+        block1 = newNode('block', {type:'bi_unary_postfix_return'}, '', node);
       }
-    } 
+    }
     current_node.appendChild(block1);
     var field1 = newNode('field', {name:'operator'}, node.operator);
     block1.appendChild(field1);
     var value1 = newNode('value', {name:'expression'});
-    block1.appendChild(value1);    
+    block1.appendChild(value1);
     var node1 = current_node;
     current_node = value1;
     c(node.argument, st, "Expression")
@@ -1048,10 +1051,10 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       case '/': op='DIVIDE'; break;
       case '**': op='POWER'; break;
       case '==': op='EQ'; type = 'bi_logic_compare'; break;
-      case '!=': op='NEQ'; type = 'bi_logic_compare'; break;        
-      case '<': op='LT'; type = 'bi_logic_compare'; break;        
-      case '<=': op='LTE'; type = 'bi_logic_compare'; break;        
-      case '>': op='GT'; type = 'bi_logic_compare'; break;        
+      case '!=': op='NEQ'; type = 'bi_logic_compare'; break;
+      case '<': op='LT'; type = 'bi_logic_compare'; break;
+      case '<=': op='LTE'; type = 'bi_logic_compare'; break;
+      case '>': op='GT'; type = 'bi_logic_compare'; break;
       case '>=': op='GTE'; type = 'bi_logic_compare'; break;
       case '&&': op='AND'; type = 'bi_logic_operation'; break;
       case '||': op='OR'; type = 'bi_logic_operation'; break;
@@ -1112,12 +1115,12 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     current_node.appendChild(block1);
     var field1 = newNode('field', {name:'OP'}, node.operator);
     block1.appendChild(field1);
-    var left = newNode('value', {name:'A'});    
+    var left = newNode('value', {name:'A'});
     block1.appendChild(left);
     var node1 = current_node;
     current_node = left;
     c(node.left, st, "Pattern")
-    var right = newNode('value', {name:'B'});    
+    var right = newNode('value', {name:'B'});
     block1.appendChild(right);
     current_node = right;
     c(node.right, st, "Expression")
@@ -1155,7 +1158,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     block1.appendChild(value1);
   }
   funcs.CallExpression = (node, st, c) => {
-    console.log(node)
+    if(debug) console.log(node)
     if(debug) console.log("CallExpression");
     current_call = true;
     var block1;
@@ -1200,7 +1203,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       block1.appendChild(func1);
       current_node = func1
       current_call = false
-      expression_statement = true;      
+      expression_statement = true;
     } else {
       block1.appendChild(newNode('field',{name:'NAME'},name));
     }
@@ -1315,7 +1318,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     }
     var from1 = newNode('value', {name:'from'});
     block1.appendChild(from1)
-    current_node = from1;    
+    current_node = from1;
     c(node.source, st, "Expression")
     current_node = node1
   }
@@ -1330,7 +1333,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       block1.appendChild(newNode('field',{name:'input'},node.imported.name));
       block1.appendChild(newNode('field',{name:'as'},node.local.name));
     }
-    current_node.appendChild(block1);          
+    current_node.appendChild(block1);
   } //ignore
   funcs.ImportDefaultSpecifier = function(node, st, c){
     if(debug) console.log("ImportDefaultSpecifier");
@@ -1343,7 +1346,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       block1.appendChild(newNode('field',{name:'input'},'*'));
       block1.appendChild(newNode('field',{name:'as'},node.local.name));
     }
-    current_node.appendChild(block1);          
+    current_node.appendChild(block1);
   } //ignore
   funcs.ImportNamespaceSpecifier = function(node, st, c){
     if(debug) console.log("ImportNameSpecifier");
@@ -1351,7 +1354,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     block1.appendChild(newNode('field',{name:'NAME'},node.local.name));
     current_node.appendChild(block1);
   } //ignore
-  
+
   funcs.Identifier = function(node, st, c){
     if(debug) console.log("Identifier "+node.name);
     if(current_call){
@@ -1387,7 +1390,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       block1 = newNode('block', {type:'bi_var_name'}, '', node);
       block1.appendChild(newNode('field', {name:"NAME"}, node.value));
     } else {
-      switch(typeof node.value){ 
+      switch(typeof node.value){
         case 'number':
           block1 = newNode('block', {type:'math_number'}, '', node);
           block1.appendChild(newNode('field', {name:'NUM'}, node.value.toString()));
@@ -1397,7 +1400,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
           if(node.value){
             field1 = newNode('field', {name:'BOOL'}, 'TRUE')
           } else {
-            field1 = newNode('field', {name:'BOOL'}, 'FALSE')          
+            field1 = newNode('field', {name:'BOOL'}, 'FALSE')
           }
           block1.appendChild(field1)
           break
@@ -1409,7 +1412,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
           current_path_chain.push(value1);
       }
     }
-    current_node.appendChild(block1);    
+    current_node.appendChild(block1);
   } // ignore()
   funcs.TaggedTemplateExpression = (node, st, c) => {
     if(debug) console.log("TaggedTemplateExpression "+node.tag);
@@ -1454,7 +1457,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       static1.appendChild(statement2)
       current_node = statement2
     }
-    switch(node.kind){        
+    switch(node.kind){
       case 'constructor':
         //block1 = newNode('block', {type: 'bi_var'}, '', node);
         //block1.appendChild(newNode('field', {name:'var'}, node.kind));
@@ -1479,7 +1482,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         current_node = statement1
         node.value.method = node.key.name
         break
-      default: 
+      default:
         //block1 = newNode('block', {type: 'bi_var'}, '', node);
         //block1.appendChild(newNode('field', {name:'var'}, node.kind));
         break;
@@ -1490,7 +1493,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
     node1.children[0].appendChild(next1);
     current_node = next1
     //current_node = node1;
-  } 
+  }
   // TODO: Take into account all node.computed cases.
   funcs.Property = (node, st, c) => {
     if(debug) console.log("Property "+node.kind);
@@ -1504,13 +1507,13 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         if(node.computed===false){
           block1.appendChild(newNode('field', {name:'name'}, node.key.name));
         } else {
-          block1.appendChild(newNode('field', {name:'name'}, '['+node.key.name+']'));          
+          block1.appendChild(newNode('field', {name:'name'}, '['+node.key.name+']'));
         }
         block1.appendChild(newNode('field', {name:'val'}, node.value.params[0].name));
         chain1 = newNode('statement', {name:'chain'});
         block1.appendChild(chain1);
         node1 = current_node;
-        current_node = chain1;    
+        current_node = chain1;
         c(node.value.body, st, "Statement")
         current_node = node1;
         break;
@@ -1520,12 +1523,12 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         if(node.computed===false){
           block1.appendChild(newNode('field', {name:'name'}, node.key.name));
         } else {
-          block1.appendChild(newNode('field', {name:'name'}, '['+node.key.name+']'));          
+          block1.appendChild(newNode('field', {name:'name'}, '['+node.key.name+']'));
         }
         chain1 = newNode('statement', {name:'chain'});
         block1.appendChild(chain1);
         node1 = current_node;
-        current_node = chain1;    
+        current_node = chain1;
         c(node.value.body, st, "Statement")
         current_node = node1;
         break;
@@ -1536,7 +1539,7 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         let key1 = newNode('value', {name:'KEY'});
         block1.appendChild(key1);
         node1 = current_node;
-        current_node = key1;    
+        current_node = key1;
         if (node.computed){
           c(node.key, st, "Expression")
         } else {
@@ -1554,25 +1557,25 @@ base.MethodDefinition = base.Property = (node, st, c) => {
         }
         let value1 = newNode('value', {name:'VAL'});
         block1.appendChild(value1);
-        current_node = value1;    
+        current_node = value1;
         c(node.value, st, "Expression")
         current_node = node1;
     }
   }
-  
+
   // acorn.
   //walk.
   recursive(ast, st, funcs);
-  
+
   let fake_last_line_node = {}
   fake_last_line_node.loc = {}
   fake_last_line_node.loc.start = {}
   fake_last_line_node.loc.start.line = 999999 // JCOA TODO: Use total lines of text
-  
+
   if(last_comment < comments.length){
     current_node.appendChild(newNode('block', {type:'bi_comment'}, '', fake_last_line_node))
   }
-  
+
   return xml1;
 }
 
@@ -1592,21 +1595,21 @@ base.MethodDefinition = base.Property = (node, st, c) => {
       onComment: comments
     };
     ast1 = acorn.parse(code, options);
-    console.log(comments)
+    if(debug) console.log(comments)
     xml1 = walk1(ast1, comments, block_loc);
     console.log(xml1);
 //     workspace.clear();
 //     Blockly.Xml.domToWorkspace(workspace, xml1);
-    
-//     workspace.cleanUp_(); // workspace.cleanUp(); // In updated Blockly 
+
+//     workspace.cleanUp_(); // workspace.cleanUp(); // In updated Blockly
 //     window._BIDE.updateWorkspace()
 //  //workspace.addChangeListener(window._BIDE.updateWorkspace);
 //     //var blockly_code = Blockly.JavaScript.workspaceToCode(Blockly.mainWorkspace);
-//     //console.log(blockly_code);  
+//     //console.log(blockly_code);
 //   } catch(err){
 //     console.log(err)
 //     // window._BIDE.b2c_error = true
-    
+
 //     let tb = workspace.topBlocks_
 //     let id = tb[tb.length-1].id
 //     //console.log(id)
