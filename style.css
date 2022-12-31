@@ -1,3 +1,15 @@
+::-webkit-scrollbar {
+    opacity: 0;
+}
+::-webkit-scrollbar-track {
+    opacity: 0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 9999px;
+}
+
+
 
 .material-symbols-outlined {
   font-variation-settings:
@@ -27,16 +39,34 @@ body {
 }
 .cm-s-darcula{
     position: absolute;
-    left: 50%;
+    left: calc(50% + 10px);
     top: 50px;
 }
-.cm-s-darcula:nth-of-type(3) {
-    top: calc(50% + 50px);
-    border-top: 5px solid #222;
+.cm-s-darcula:nth-of-type(5) {
+    top: calc(50% + 30px);
 }
+.editor-resizer {
+    position: absolute;
+    left: calc(50% + 10px);
+    width: calc(50% - 10px);
+    top: calc(50% + 20px);
+    height: 10px;
+    background-color: #222;
+    cursor: row-resize;
+}
+.blocklyworkspace-resizer {
+    position: absolute;
+    left: 50%;
+    width: 10px;
+    top: 50px;
+    height: calc(100% - 50px);
+    background-color: #222;
+    cursor: col-resize;
+}
+
 #execution {
     position: absolute;
-    top:calc(40% + 50px);
+    top:calc(50% - 70px);
     right:50px;
     width:50px;
     height:50px;
@@ -49,7 +79,7 @@ body {
 }
 #consoleclear {
     position: absolute;
-    top:calc(55% + 50px);
+    top:calc(50% + 70px);
     right:50px;
     width:50px;
     height:50px;
@@ -80,6 +110,7 @@ header {
 header img {
     height: 50px;
     margin-left: 20px;
+    user-select: none;
 }
 header input[type="text"] {
     height: 30px;
@@ -91,6 +122,9 @@ header input[type="text"] {
     padding: 1px 5px;
     font-size: bold;
     color: white;
+}
+.menu {
+    user-select: none
 }
 .menu_lists {
     display: flex;
@@ -131,6 +165,7 @@ header input[type="text"] {
     padding: 10px;
     height: 30px;
     line-height: 30px;
+
 }
 
 ul, li {
@@ -141,6 +176,31 @@ hr {
     border: 1px solid #e67e00;
     margin: 0;
 }
+
+input[type="checkbox"] {
+    opacity:0;
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+}
+
+input[type="checkbox"] + span::before {
+    display: inline-block;
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid gold;
+    border-radius: 5px;
+    margin-right: .5rem;
+    vertical-align: middle;
+
+}
+input[type="checkbox"]:checked + span::before {
+    background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><polyline fill='none' stroke='rgb(255,255,0)' stroke-width='3'%20points='2,7.3%207.3,12.7%2018,2%20'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 0 2px;
+}
+
 #open_dialog_background {
     position: absolute;
     z-index: 999;
@@ -205,7 +265,8 @@ hr {
 #file_lists {
     margin: 10px;
     max-height: 50vh;
-    overflow:scroll;
+    overflow-y:scroll;
+    overflow-x: hidden;
 }
 #file_lists::-webkit-scrollbar{
     display:none;
@@ -315,3 +376,5 @@ hr {
 .blocklyTreeRow {
     height: initial;
 }
+
+

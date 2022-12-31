@@ -83,7 +83,7 @@ $("#create_block").click(function () {
         Blockly.Xml.appendDomToWorkspace(xml, workspace)
     } catch (error) {
         console.log(error)
-        if (!(error == "TypeError: Next block does not have previous statement.")) {
+        if (!(error == "TypeError: Next block does not have previous statement." || error == "TypeError: Next statement does not exist.")) {
             $("#error_text").val(error)
             $("#error_dialog_background").css("display", "block");
         } else {
@@ -124,13 +124,16 @@ function initApi(interpreter, globalObject) {
 function nextStep() {
     try {
         if (myInterpreter.step() && play) {
-            setTimeout(nextStep, 0.1);
+            setTimeout(nextStep, 0);
         } else {
             $("#execution .material-symbols-outlined").text("play_arrow");
             play = false;
         }
     } catch (error) {
-        console.log(error)
+        var doc = output_eval.getDoc();
+        doc.setValue(error.toString());
+        $("#execution .material-symbols-outlined").text("play_arrow");
+        play = false;
     }
 }
 
@@ -145,19 +148,28 @@ $("#execution").click(function() {
         var doc = output_eval.getDoc();
         doc.setValue("");
         var code = editor.getValue();
-        myInterpreter = new Interpreter(code, initApi);
+
         // generateBlock(code);
         try {
             // eval(code);
 
             // myInterpreter.run();
+            myInterpreter = new Interpreter(code, initApi);
             $("#execution .material-symbols-outlined").text("pause");
             play = true;
-            nextStep();
+            if (!$("#turbo_mode").prop('checked')) {
+                nextStep();
+            } else {
+                eval(code);
+                $("#execution .material-symbols-outlined").text("play_arrow");
+                play = false;
+            }
 
         } catch (error) {
             var doc = output_eval.getDoc();
             doc.setValue(error.toString());
+            $("#execution .material-symbols-outlined").text("play_arrow");
+            play = false;
         }
         if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled")) {
             var xml = Blockly.Xml.workspaceToDom(workspace);
@@ -210,7 +222,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("codebox"),
     theme: "darcula",
 
 });
-editor.setSize("50%", "50%");
+editor.setSize("calc(50% - 10px)", "calc(50% - 30px)");
 editor.save();
 
 var output_eval = CodeMirror.fromTextArea(document.getElementById("codeoutput"),
@@ -220,8 +232,59 @@ var output_eval = CodeMirror.fromTextArea(document.getElementById("codeoutput"),
     theme: "darcula",
 
 });
-output_eval.setSize("50%", "calc(50% - 50px)");
+output_eval.setSize("calc(50% - 10px)", "calc(50% - 30px)");
 output_eval.save();
+
+let is_drag_editor = false;
+let is_drag_workspace = false;
+
+$(".editor-resizer").on('mousedown', function() {
+    is_drag_editor = true;
+})
+$(".blocklyworkspace-resizer").on('mousedown', function() {
+    is_drag_workspace = true;
+})
+
+$("body").on('mouseup', function() {
+    is_drag_editor = false;
+    is_drag_workspace = false;
+})
+
+$("body").on('mousemove', function(e) {
+    if (is_drag_editor === true && e.pageY > 50 && ($(window).height() - 10) > e.pageY) {
+        // e.pageY > 150 && ($(window).height() - 110) > e.pageY
+        $(".editor-resizer").css("top", (e.pageY + "px"))
+        editor.setSize(null, ((e.pageY - 50) + "px"));
+        output_eval.setSize(null, ("calc(100% - " + (e.pageY + 10) + "px"));
+        $(".cm-s-darcula:nth-of-type(5)").css("top", ((e.pageY + 10) + "px"));
+        $("#execution").css("top", ((e.pageY - 90) + "px"))
+        $("#consoleclear").css("top", ((e.pageY + 50) + "px"))
+
+    } else if (is_drag_workspace === true && ($(window).width() - 10) > e.pageX) {
+        $(".blocklyworkspace-resizer").css("left", (e.pageX + "px"))
+        $(".editor-resizer").css("left", (e.pageX + 10) + "px")
+        $(".editor-resizer").css("width", ("calc(100% - " + (e.pageX + 10) + "px"))
+        $("#blocklyArea").width(e.pageX + "px")
+        Blockly.svgResize(workspace);
+        editor.setSize(("calc(100% - " + (e.pageX + 10) + "px"), null);
+        output_eval.setSize(("calc(100% - " + (e.pageX + 10) + "px"), null);
+        $(".cm-s-darcula:nth-of-type(3)").css("left", ((e.pageX + 10) + "px"));
+        $(".cm-s-darcula:nth-of-type(5)").css("left", ((e.pageX + 10) + "px"));
+    }
+    if (is_drag_editor === true || is_drag_workspace === true) {
+        if (!(e.pageY > 150 && ($(window).width() - 120) > e.pageX)) {
+            $("#execution").css("display", "none")
+        } else {
+            $("#execution").css("display", "block")
+        }
+        if (!(($(window).height() - 110) > e.pageY && ($(window).width() - 120) > e.pageX)) {
+            $("#consoleclear").css("display", "none")
+        } else {
+            $("#consoleclear").css("display", "block")
+        }
+    }
+
+});
 
 // editor.on("change", function (e) {
 //     console.log(e)
@@ -414,23 +477,25 @@ $("#cancel").click(function() {
     }
 })
 $("#open").click(function() {
-    $("#open_dialog_background").css("display", "none");
-    welcome = false;
-    const filename = $('input:radio[name="filename"]:checked').attr("id");
-    $("#file_lists").empty();
-    // console.log(filename);
-    let result = JSON.parse(localStorage.getItem(filename));
-    // console.log(result);
-    // console.log(result["block_xml"]);
-    var xml = Blockly.Xml.textToDom(result["block_xml"]);
-    workspace.clear();
-    Blockly.Xml.domToWorkspace(xml, workspace);
-    $("#filename").val(filename);
-    project_name = $("#filename").val();
-    var doc = output_eval.getDoc();
-    doc.setValue(result["console_output"]);
-    var doc = editor.getDoc();
-    doc.setValue(result["code"]);
+    if ($('input:radio[name="filename"]:checked').length > 0) {
+        $("#open_dialog_background").css("display", "none");
+        welcome = false;
+        const filename = $('input:radio[name="filename"]:checked').attr("id");
+        $("#file_lists").empty();
+        // console.log(filename);
+        let result = JSON.parse(localStorage.getItem(filename));
+        // console.log(result);
+        // console.log(result["block_xml"]);
+        var xml = Blockly.Xml.textToDom(result["block_xml"]);
+        workspace.clear();
+        Blockly.Xml.domToWorkspace(xml, workspace);
+        $("#filename").val(filename);
+        project_name = $("#filename").val();
+        var doc = output_eval.getDoc();
+        doc.setValue(result["console_output"]);
+        var doc = editor.getDoc();
+        doc.setValue(result["code"]);
+    }
 })
 window.onload = function() {
     welcome = true;

@@ -72,7 +72,7 @@ Blockly.Blocks['bi_assignment_return'] = {
         .setCheck(null)
         .appendField(new Blockly.FieldTextInput('='), 'OP');
     this.setInputsInline(true);
-    this.setOutput(true);    
+    this.setOutput(true);
     this.setColour(330);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
@@ -190,7 +190,7 @@ Blockly.Blocks['bi_logic_compare'] = {
 };
 
 
-  
+
 Blockly.Blocks['bi_logic_operation'] = {
   /**
    * Block for logical operations: 'and', 'or'.
@@ -222,7 +222,7 @@ Blockly.Blocks['bi_logic_operation'] = {
   }
 };
 
-  
+
 Blockly.Blocks['bi_try_catch'] = {
   init: function() {
     this.appendStatementInput('try')
@@ -231,7 +231,7 @@ Blockly.Blocks['bi_try_catch'] = {
     this.appendStatementInput('catch')
         .setCheck(null)
         .appendField('catch')
-        .appendField(new Blockly.FieldTextInput(''), 'parameter');    
+        .appendField(new Blockly.FieldTextInput(''), 'parameter');
     this.appendStatementInput('finally')
         .setCheck(null)
         .appendField('finally');
@@ -248,7 +248,7 @@ Blockly.Blocks['bi_catch'] = {
     this.appendStatementInput('catch')
         .setCheck(null)
         .appendField('catch')
-        .appendField(new Blockly.FieldTextInput(''), 'parameter');    
+        .appendField(new Blockly.FieldTextInput(''), 'parameter');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(90);
@@ -321,15 +321,15 @@ Blockly.Blocks['bi_import'] = {
 //    this.appendValueInput('import')
 //        .setCheck(null)
 //        .appendField('import');
-    // this.appendAddSubGroup('', 'items',null, //--------------------------------------------------------------------error------------------------ 
+    // this.appendAddSubGroup('', 'items',null, //--------------------------------------------------------------------error------------------------
     //                        '');
 
     // this.suppressPrefixSuffix(true),
     // tihs.mutator(controls_if_mutator),
     // this.extensions("items"),
     this.itemCount_ = 2;
-    // this.updateShape_();  
-    this.setMutator(new Blockly.Mutator(['mutator_items']));  
+    // this.updateShape_();
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.setOnChange(function(changeEvent) {});
     this.appendValueInput('from')
         .setCheck(null)
@@ -344,7 +344,6 @@ Blockly.Blocks['bi_import'] = {
     for (let i = 0; i < this.itemCount_; i++) {
       if (!this.getInput('items' + i)) {
         var input = this.appendValueInput('items' + i).setAlign(Blockly.Input.Align.RIGHT);
-        input.appendField("case");
       }
     }
     for (let i = this.itemCount_; this.getInput('items' + i); i++) {
@@ -552,7 +551,7 @@ Blockly.Blocks['mutator_items'] = {
 }
 Blockly.Blocks['mutator_container'] = {
   init: function() {
-    this.appendStatementInput("case")
+    this.appendStatementInput("container")
         .setCheck(null);
     this.setColour(120);
  this.setTooltip("");
@@ -570,7 +569,7 @@ Blockly.Blocks['bi_switch'] = {
     //                        '');
     // this.itemCount_ = 1;
     // this.updateShape_();
-    this.setMutator(new Blockly.Mutator(['mutator_items']));  
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.appendStatementInput('default')
         .setCheck(null)
         .appendField('default');
@@ -596,7 +595,7 @@ Blockly.Blocks['bi_switch'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -606,7 +605,7 @@ Blockly.Blocks['bi_switch'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -627,7 +626,7 @@ Blockly.Blocks['bi_switch'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -692,7 +691,7 @@ Blockly.Blocks['bi_s1'] = {
     this.appendValueInput('test')
         .appendField('test')
         .setCheck(null);
-    this.itemCount_ = 1;
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.setInputsInline(false);
     this.setPreviousStatement(true, null); // 'Method');
@@ -716,8 +715,8 @@ Blockly.Blocks['bi_call'] = {
     // this.appendAddSubNamed('', 'items',
     //                        null,
     //                        '');
-    this.setMutator(new Blockly.Mutator(['mutator_items'])); 
-    this.itemCount_ = 1;
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.appendValueInput('chain')
         .appendField(')')
@@ -742,7 +741,7 @@ Blockly.Blocks['bi_call'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -752,7 +751,7 @@ Blockly.Blocks['bi_call'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -773,7 +772,7 @@ Blockly.Blocks['bi_call'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -782,7 +781,7 @@ Blockly.Blocks['bi_call'] = {
       itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
     }
   },
-  
+
 };
 
 Blockly.Blocks['bi_call_return'] = {
@@ -799,8 +798,8 @@ Blockly.Blocks['bi_call_return'] = {
     // this.appendAddSubNamed('n1', 'items',
     //                        null,
     //                        'n1');
-    this.setMutator(new Blockly.Mutator(['mutator_items'])); 
-    this.itemCount_ = 1;
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.appendValueInput('chain')
         .appendField(')')
@@ -824,7 +823,7 @@ Blockly.Blocks['bi_call_return'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -834,7 +833,7 @@ Blockly.Blocks['bi_call_return'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -855,7 +854,7 @@ Blockly.Blocks['bi_call_return'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -881,11 +880,11 @@ Blockly.Blocks['bi_direct_call_editable'] = {
     // this.appendAddSubGroup('', 'items',
     //                          null,
     //                          '');
-    this.setMutator(new Blockly.Mutator(['mutator_items'])); 
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.appendValueInput('chain')
         .appendField(')')
         .setCheck(null); // (['Method', 'Field']);
-    this.itemCount_ = 1;
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.setInputsInline(true);
     this.setPreviousStatement(true, null); // 'Method');
@@ -907,7 +906,7 @@ Blockly.Blocks['bi_direct_call_editable'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -917,7 +916,7 @@ Blockly.Blocks['bi_direct_call_editable'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -938,7 +937,7 @@ Blockly.Blocks['bi_direct_call_editable'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -964,11 +963,11 @@ Blockly.Blocks['bi_direct_call_editable_return'] = {
     // this.appendAddSubGroup('', 'items',
     //                          null,
     //                          '');
-    this.setMutator(new Blockly.Mutator(['mutator_items'])); 
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.appendValueInput('chain')
         .appendField(')')
         .setCheck(null); // (['Method', 'Field']);
-    this.itemCount_ = 1;
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.setInputsInline(true);
     //this.setPreviousStatement(true, null); // 'Method');
@@ -990,7 +989,7 @@ Blockly.Blocks['bi_direct_call_editable_return'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -1000,7 +999,7 @@ Blockly.Blocks['bi_direct_call_editable_return'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -1021,7 +1020,7 @@ Blockly.Blocks['bi_direct_call_editable_return'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -1031,7 +1030,7 @@ Blockly.Blocks['bi_direct_call_editable_return'] = {
     }
   },
 };
-  
+
 Blockly.Blocks['bi_call_editable'] = {
   /**
    * Block for ...
@@ -1046,11 +1045,11 @@ Blockly.Blocks['bi_call_editable'] = {
     // this.appendAddSubGroup('', 'items',
     //                          null,
     //                          '');
-    this.setMutator(new Blockly.Mutator(['mutator_items']));  
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.appendValueInput('chain')
         .appendField(')')
         .setCheck(null); // (['Method', 'Field']);
-    this.itemCount_ = 1;
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.setInputsInline(true);
     this.setPreviousStatement(true, null); // 'Method');
@@ -1092,7 +1091,7 @@ Blockly.Blocks['bi_call_editable'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -1103,7 +1102,7 @@ Blockly.Blocks['bi_call_editable'] = {
   },
 
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
 
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
@@ -1127,7 +1126,7 @@ Blockly.Blocks['bi_call_editable'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
 
     var i = 0;
     while (itemBlock) {
@@ -1154,11 +1153,11 @@ Blockly.Blocks['bi_call_editable_return'] = {
     // this.appendAddSubGroup('', 'items',
     //                          null,
     //                          '');
-    this.setMutator(new Blockly.Mutator(['mutator_items'])); 
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
     this.appendValueInput('chain')
         .appendField(')')
         .setCheck(null); // (['Method', 'Field']);
-    this.itemCount_ = 1;
+    this.itemCount_ = 0;
     // this.updateShape_();
     this.setInputsInline(true);
     //this.setPreviousStatement(true, null); // 'Method');
@@ -1180,7 +1179,7 @@ Blockly.Blocks['bi_call_editable_return'] = {
   decompose: function(workspace) {
     var topBlock = workspace.newBlock('mutator_container');
     topBlock.initSvg();
-    var connection = topBlock.getInput('case').connection;
+    var connection = topBlock.getInput('container').connection;
     for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = workspace.newBlock('mutator_items');
       itemBlock.initSvg();
@@ -1190,7 +1189,7 @@ Blockly.Blocks['bi_call_editable_return'] = {
     return topBlock;
   },
   compose: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
       connections.push(itemBlock.valueConnection_);
@@ -1211,7 +1210,7 @@ Blockly.Blocks['bi_call_editable_return'] = {
     }
   },
   saveConnections: function(topBlock) {
-    var itemBlock = topBlock.getInputTargetBlock('case');
+    var itemBlock = topBlock.getInputTargetBlock('container');
     var i = 0;
     while (itemBlock) {
       var input = this.getInput('items' + i);
@@ -1301,7 +1300,7 @@ Blockly.Blocks['bi_maps_get'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
-  
+
 Blockly.Blocks['bi_var'] = {
   init: function() {
     this.appendValueInput('val')
@@ -1459,7 +1458,7 @@ Blockly.Blocks['bi_string_return'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
-  
+
 Blockly.Blocks['bi_index'] = {
   init: function() {
     this.appendValueInput('index')
@@ -1565,7 +1564,7 @@ Blockly.Blocks['bi_unary_postfix_return'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
-  
+
 Blockly.Blocks['bi_spread'] = {
   init: function() {
     this.appendValueInput('arg_array')
@@ -1588,6 +1587,106 @@ Blockly.Blocks['bi_parenthesis'] = {
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
+};
+
+Blockly.Blocks['maps_create'] = {
+  init: function() {
+    this.appendValueInput("KEY")
+        .setCheck(null);
+    this.appendDummyInput()
+        .appendField(":");
+    this.appendValueInput("VAL")
+        .setCheck(null);
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setColour(300);
+  this.setTooltip("");
+  this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['maps_create_with'] = {
+  /**
+   * Block for building anonymous call with return
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.appendDummyInput()
+        .appendField('Dict ');
+    this.setMutator(new Blockly.Mutator(['mutator_items']));
+    this.setHelpUrl('http://www.example.com/');
+    this.setColour(300);
+    // this.appendAddSubGroup('', 'items',
+    //                          null,
+    //                          '');
+
+    // this.appendValueInput('chain')
+    //     .appendField(')')
+    //     .setCheck(null); // (['Method', 'Field']);
+    this.itemCount_ = 1;
+
+    // this.updateShape_();
+    this.setInputsInline(true);
+    //this.setPreviousStatement(true, null); // 'Method');
+    //this.setNextStatement(true, null); // 'Method');
+    this.setOutput(true, null);
+    this.setTooltip('');
+  },
+  updateShape_: function() {
+    for (let i = 0; i < this.itemCount_; i++) { if (!this.getInput('items' + i)) {
+        var input = this.appendValueInput('items' + i).setAlign(Blockly.Input.Align.RIGHT);
+        input.appendField(",");
+    }}
+    for (let i = this.itemCount_; this.getInput('items' + i); i++) { this.removeInput('items' + i); }
+
+  },
+  saveExtraState: function() { return { 'itemCount': this.itemCount_, };},
+  loadExtraState: function(state) {this.itemCount_ = state['itemCount']; this.updateShape_();},
+  mutationToDom: function() { var container = Blockly.utils.xml.createElement('mutation'); container.setAttribute('items', this.itemCount_); return container;},
+  domToMutation: function(xmlElement) { this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10); this.updateShape_();},
+  decompose: function(workspace) {
+    var topBlock = workspace.newBlock('mutator_container');
+    topBlock.initSvg();
+    var connection = topBlock.getInput('container').connection;
+    console.log(topBlock)
+    for (var i = 0; i < this.itemCount_; i++) {
+      var itemBlock = workspace.newBlock('mutator_items');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return topBlock;
+  },
+  compose: function(topBlock) {
+    var itemBlock = topBlock.getInputTargetBlock('container');
+    var connections = [];
+    while (itemBlock && !itemBlock.isInsertionMarker()) {  // Ignore insertion markers!
+      connections.push(itemBlock.valueConnection_);
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    for (var i = 0; i < this.itemCount_; i++) {
+      var connection = this.getInput('items' + i).connection.targetConnection;
+      if (connection && connections.indexOf(connection) == -1) {
+        connection.disconnect();
+      }
+    }
+    this.itemCount_ = connections.length;
+    this.updateShape_();
+
+    for (var i = 0; i < this.itemCount_; i++) {
+      Blockly.Mutator.reconnect(connections[i], this, 'items' + i);
+    }
+  },
+  saveConnections: function(topBlock) {
+    var itemBlock = topBlock.getInputTargetBlock('container');
+    var i = 0;
+    while (itemBlock) {
+      var input = this.getInput('items' + i);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      i++;
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+    }
+  },
 };
 // return Blockly.Blocks;
 // }
