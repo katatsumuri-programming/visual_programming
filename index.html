@@ -43,6 +43,8 @@
   <link rel="stylesheet" href="css2.css" /> -->
   <title>Blockly Sample</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
 
 </head>
 <body>
@@ -95,6 +97,11 @@
       </ul>
     </div>
     <input type="text" placeholder="filename" value="Untitled" id="filename">
+    <div id="share">
+      <span class="material-symbols-outlined share_icon">
+        share
+        </span>
+    </div>
   </header>
   <div id="blocklyArea">
     <div id="blocklyDiv" style="position: absolute"></div>
@@ -555,5 +562,35 @@
       </div>
     </div>
   </div>
-  <script src="script-blockly.js"></script>
+  <div id="share_dialog_background">
+    <div id="share_dialog">
+      <h2>共有</h2>
+      <button id="create_link">リンクを作成</button>
+      <div class="share_info">
+        <!-- <div class="selectBox">
+          <div class="selectBox__output material-symbols-outlined"></div>
+          <div class="selectBox__selector">
+            <div class="selectBox__selectorItem" data-select="editor">編集者</div>
+            <div class="selectBox__selectorItem" data-select="reader">閲覧者</div>
+          </div>
+          <select name="role">
+            <option value="editor">編集者</option>
+            <option value="reader">閲覧者</option>
+          </select>
+        </div> -->
+        <div class="link">
+          <p class="link_field">https://aaaa</p>
+          <button id="link_copy">
+            <span class="material-symbols-outlined">
+              content_copy
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button id="ok">OK</button>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>

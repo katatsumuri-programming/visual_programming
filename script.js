@@ -4,9 +4,24 @@ var project_name = "";
 var myInterpreter;
 var play = false;
 var last_workspace_xml;
+var project_id = null;
+var edit = true;
+
+function getParam(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+
 // var code_block_generate = false;
 $("#open_dialog_background").css("display", "none");
 $("#error_dialog_background").css("display", "none");
+$("#share_dialog_background").css("display", "none");
 Blockly.HSV_SATURATION = 0.9;
 Blockly.HSV_VALUE = 0.7;
 Blockly.Flyout.prototype.autoClose=false;
@@ -21,6 +36,7 @@ var workspace = Blockly.inject('blocklyArea',
         // theme: dark
         autoClose: false,
         collapse: false,
+        readOnly: false,
         zoom: {
             controls: true,
             wheel: true,
@@ -55,7 +71,8 @@ workspace.addChangeListener(function() {
         var data = {
             "block_xml": myBlockXml,
             "code": code,
-            "console_output": console_output
+            "console_output": console_output,
+            "project_id": project_id
         };
         var setjson = JSON.stringify(data);
         localStorage.setItem($("#filename").val(), setjson);
@@ -180,7 +197,8 @@ $("#execution").click(function() {
             var data = {
                 "block_xml": myBlockXml,
                 "code": code,
-                "console_output": console_output
+                "console_output": console_output,
+                "project_id": project_id
             };
             var setjson = JSON.stringify(data);
             localStorage.setItem($("#filename").val(), setjson);
@@ -332,7 +350,8 @@ $("#save_computer").click(function () {
     var data = {
         "block_xml": myBlockXml,
         "code": code,
-        "console_output": console_output
+        "console_output": console_output,
+        "project_id": project_id
     };
     const json = JSON.stringify(data, null, '  ');
     const blob = new Blob([json], { type: 'application/json' });
@@ -349,6 +368,7 @@ $("#load_computer").click(function () {
         value = window.confirm("編集中のプロジェクトが削除されます。\nよろしいですか?");
     }
     if (value) {
+        project_id = null;
         input_el = document.createElement('input');
         document.body.appendChild(input_el);
         input_el.type = "file";
@@ -370,10 +390,19 @@ $("#load_computer").click(function () {
                 Blockly.Xml.domToWorkspace(xml, workspace);
                 $("#filename").val(file["name"].match(/([^/]*)\./)[1]);
                 project_name = $("#filename").val();
+                project_id = result["project_id"]
                 var doc = output_eval.getDoc();
                 doc.setValue(result["console_output"]);
                 var doc = editor.getDoc();
                 doc.setValue(result["code"]);
+                var urlSearchParams = new URLSearchParams(location.search)
+                if (project_id) {
+                    urlSearchParams.set("project", project_id)
+                }else {
+                    urlSearchParams.delete("project")
+                }
+                history.replaceState("", "", `?${urlSearchParams.toString()}`)
+
             };
         },false);
     }
@@ -388,10 +417,26 @@ $("#overwrite_browser").click(function(){
     var data = {
         "block_xml": myBlockXml,
         "code": code,
-        "console_output": console_output
+        "console_output": console_output,
+        "project_id": project_id
     };
     var setjson = JSON.stringify(data);
     localStorage.setItem($("#filename").val(), setjson);
+    if (project_id) {
+        db.collection("share_project").doc(project_id).set({
+            block_xml: myBlockXml,
+            code: code,
+            console_output: console_output,
+            project_name: project_name,
+            edit: edit
+          })
+          .then(()=>{
+            console.log("更新に成功しました");
+          })
+          .catch((error)=>{
+            console.log(`更新に失敗しました (${error})`);
+          });
+    }
     save = true;
 })
 
@@ -424,12 +469,15 @@ $("#save_browser").click(function(){
     var data = {
         "block_xml": myBlockXml,
         "code": code,
-        "console_output": console_output
+        "console_output": console_output,
+        "project_id": project_id
     };
+
     file_name = save_browser();
     if (!(file_name == "" || file_name == "undefined" || file_name == null)) {
         var setjson = JSON.stringify(data);
         localStorage.setItem(file_name, setjson);
+
         save = true;
     } else {
         window.alert("保存できませんでした。")
@@ -478,6 +526,8 @@ $("#cancel").click(function() {
 })
 $("#open").click(function() {
     if ($('input:radio[name="filename"]:checked').length > 0) {
+        project_id = null;
+        edit = true;
         $("#open_dialog_background").css("display", "none");
         welcome = false;
         const filename = $('input:radio[name="filename"]:checked').attr("id");
@@ -491,32 +541,21 @@ $("#open").click(function() {
         Blockly.Xml.domToWorkspace(xml, workspace);
         $("#filename").val(filename);
         project_name = $("#filename").val();
+        project_id = result["project_id"]
         var doc = output_eval.getDoc();
         doc.setValue(result["console_output"]);
         var doc = editor.getDoc();
         doc.setValue(result["code"]);
+        var urlSearchParams = new URLSearchParams(location.search)
+        if (project_id) {
+            urlSearchParams.set("project", project_id)
+        }else {
+            urlSearchParams.delete("project")
+        }
+        history.replaceState("", "", `?${urlSearchParams.toString()}`)
     }
 })
-window.onload = function() {
-    welcome = true;
-    // $("#name_prompt_background").css("display", "block");
-    $("#open_dialog_background").css("display", "block");
-    // welcome = true;
-    for (var i = 0; i < localStorage.length; i++) {
-        var filename = localStorage.key(i);
-        var p_tag = $("<p class='filename'></p>");
-        var input_tag = $("<input type='radio' name='filename'>");
-        var label_tag = $("<label for='file1'></label>");
-        var delete_button = $("<span id='delete'></span>");
-        input_tag.attr("id", filename);
-        label_tag.attr("for", filename);
-        label_tag.text(filename);
-        label_tag.append(delete_button);
-        p_tag.append(input_tag);
-        p_tag.append(label_tag);
-        $("#file_lists").append(p_tag);
-    }
-}
+
 function new_file() {
 
     var same = false;
@@ -530,6 +569,8 @@ function new_file() {
         if (same) {
             var override = window.confirm("同じ名前のファイルがあります。上書きしますか？");
             if (override) {
+                project_id = null;
+                edit = true;
                 var doc = editor.getDoc();
                 doc.setValue("");
                 var doc = output_eval.getDoc();
@@ -541,7 +582,8 @@ function new_file() {
                 var data = {
                     "block_xml": myBlockXml,
                     "code": "",
-                    "console_output": ""
+                    "console_output": "",
+                    "project_id": null
                 };
                 localStorage.removeItem(project_name);
                 var setjson = JSON.stringify(data);
@@ -551,8 +593,17 @@ function new_file() {
                 $("#filename").val(project_name);
                 $("#open_dialog_background").css("display", "none");
                 $("#file_lists").empty();
+                var urlSearchParams = new URLSearchParams(location.search)
+                if (project_id) {
+                    urlSearchParams.set("project", project_id)
+                }else {
+                    urlSearchParams.delete("project")
+                }
+                history.replaceState("", "", `?${urlSearchParams.toString()}`)
             }
         } else {
+            project_id = null;
+            edit = true;
             var doc = editor.getDoc();
             doc.setValue("");
             var doc = output_eval.getDoc();
@@ -564,7 +615,8 @@ function new_file() {
             var data = {
                 "block_xml": myBlockXml,
                 "code": "",
-                "console_output": ""
+                "console_output": "",
+                "project_id": project_id
             };
             localStorage.removeItem(project_name);
             var setjson = JSON.stringify(data);
@@ -574,6 +626,13 @@ function new_file() {
             welcome = false;
             $("#open_dialog_background").css("display", "none");
             $("#file_lists").empty();
+            var urlSearchParams = new URLSearchParams(location.search)
+            if (project_id) {
+                urlSearchParams.set("project", project_id)
+            }else {
+                urlSearchParams.delete("project")
+            }
+            history.replaceState("", "", `?${urlSearchParams.toString()}`)
         }
     }
 }
@@ -647,7 +706,8 @@ $("#filename").change(function() {
     var data = {
         "block_xml": myBlockXml,
         "code": code,
-        "console_output": console_output
+        "console_output": console_output,
+        "project_id": project_id
     };
 
     var same = false;
@@ -664,8 +724,219 @@ $("#filename").change(function() {
         var setjson = JSON.stringify(data);
         localStorage.setItem($("#filename").val(), setjson);
         project_name = $("#filename").val();
+        if (project_id) {
+            db.collection("share_project").doc(project_id).set({
+                block_xml: myBlockXml,
+                code: code,
+                console_output: console_output,
+                project_name: project_name,
+                edit: edit
+              })
+              .then(()=>{
+                console.log("更新に成功しました");
+              })
+              .catch((error)=>{
+                console.log(`更新に失敗しました (${error})`);
+              });
+        }
+
         save = true;
         window.alert("名前を変更しました。")
     }
 
+})
+
+const config = {
+    apiKey: "AIzaSyC2YSVVGd3YbIenCscwh1jW6z43lsRNUBM",
+    authDomain: "visualprogramming-2e51d.firebaseapp.com",
+    projectId: "visualprogramming-2e51d",
+    storageBucket: "visualprogramming-2e51d.appspot.com",
+    messagingSenderId: "405243814608",
+    appId: "1:405243814608:web:399562455ed5148b83f4d5",
+    measurementId: "G-72TZ0MNMCF"
+};
+firebase.initializeApp(config);
+var db = firebase.firestore();
+
+
+window.onload = function() {
+    welcome = true;
+    // $("#name_prompt_background").css("display", "block");
+    $("#open_dialog_background").css("display", "block");
+    // welcome = true;
+    for (var i = 0; i < localStorage.length; i++) {
+        var filename = localStorage.key(i);
+        var p_tag = $("<p class='filename'></p>");
+        var input_tag = $("<input type='radio' name='filename'>");
+        var label_tag = $("<label for='file1'></label>");
+        var delete_button = $("<span id='delete'></span>");
+        input_tag.attr("id", filename);
+        label_tag.attr("for", filename);
+        label_tag.text(filename);
+        label_tag.append(delete_button);
+        p_tag.append(input_tag);
+        p_tag.append(label_tag);
+        $("#file_lists").append(p_tag);
+    }
+    project_id = getParam("project");
+
+
+    if (project_id) {
+        var docRef = db.collection("share_project").doc(project_id);
+
+        docRef.get().then((doc)=>{
+            if (doc.exists) {
+                console.log( doc.data() );
+                let result = doc.data();
+
+                const filename = result["project_name"];
+                // console.log(filename);
+
+                // console.log(result);
+                // console.log(result["block_xml"]);
+
+                var block_xml = result["block_xml"].replace(/\\/g, '');
+                var xml = Blockly.Xml.textToDom(block_xml);
+                workspace.clear();
+                console.log(xml)
+                Blockly.Xml.domToWorkspace(xml, workspace);
+                $("#filename").val(filename);
+                project_name = $("#filename").val();
+                edit = result["edit"]
+
+                var doc = editor.getDoc();
+                doc.setValue(result["code"]);
+                welcome = false;
+                $("#file_lists").empty();
+                $("#open_dialog_background").css("display", "none");
+
+            } else {
+                console.log("404");
+            }
+        })
+        .catch( (error) => {
+            alert(`データを取得できませんでした (${error})`);
+        });
+    }
+}
+
+$("#share").click(function() {
+    $("#share_dialog_background").css("display", "block");
+    if (project_id) {
+        var docRef = db.collection("share_project").doc(project_id);
+
+        docRef.get().then((doc)=>{
+            if (doc.exists) {
+                $("#create_link").css("display", "none");
+                $(".share_info").css("display", "block");
+                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + project_id)
+            } else {
+                $("#create_link").css("display", "block");
+                $(".share_info").css("display", "none");
+            }
+        })
+    } else {
+        $("#create_link").css("display", "block");
+        $(".share_info").css("display", "none");
+    }
+})
+$("#create_link").click(function() {
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var myBlockXml = Blockly.Xml.domToText(xml);
+    // console.log(myBlockXml);
+    var code = editor.getValue();
+    var console_output = output_eval.getValue();
+    db.collection("share_project").add({
+        block_xml: myBlockXml,
+        code: code,
+        console_output: console_output,
+        project_name: project_name,
+        edit: edit
+    })
+    .then((doc) => {
+        project_id = doc.id
+        $("#create_link").css("display", "none");
+        $(".share_info").css("display", "block");
+        $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + project_id)
+
+        var xml = Blockly.Xml.workspaceToDom(workspace);
+        var myBlockXml = Blockly.Xml.domToText(xml);
+        var code = editor.getValue();
+        var console_output = output_eval.getValue();
+        var data = {
+            "block_xml": myBlockXml,
+            "code": code,
+            "console_output": console_output,
+            "project_id": project_id
+        };
+        var setjson = JSON.stringify(data);
+        localStorage.setItem($("#filename").val(), setjson);
+    })
+    .catch((error) => {
+        alert(`共有設定をできませんでした (${error})`);
+    });
+})
+
+$("#link_copy").click(function() {
+    text = $(".link_field").text()
+    if (navigator.clipboard == undefined) {
+        window.clipboardData.setData("Text", text);
+    } else {
+        navigator.clipboard.writeText(text);
+    }
+})
+
+$('.selectBox__output').each(function () {
+    const defaultText = $(this).next('.selectBox__selector').children('.selectBox__selectorItem:first-child').text()
+    $(this).text(defaultText);
+})
+
+//出力の枠をクリックした時の動作
+$('.selectBox__output').on('click', function (e) {
+    e.stopPropagation();
+    if ($(this).hasClass('open')) {
+        $(this).next('.selectBox__selector').slideUp();
+    } else {
+        $(this).next('.selectBox__selector').slideDown();
+    }
+    $(this).toggleClass('open');
+});
+
+//選択肢をクリックした時の動作
+$('.selectBox__selectorItem').on('click', function () {
+    $('.selectBox__output').toggleClass('open');
+    const selectVal = $(this).data('select');
+    const selectText = $(this).text();
+    $(this).parent('.selectBox__selector').prev('.selectBox__output').text(selectText);
+    $(this).parent('.selectBox__selector').slideUp();
+    $(this).parents('.selectBox__output').slideDown();
+    $(this).parent('.selectBox__selector').next('select').val(selectVal);
+    console.log($(this).attr("data-select"))
+    if ($(this).attr("data-select") == "editor") {
+        edit = true;
+    } else {
+        edit = false;
+    }
+});
+
+$("#ok").click(function() {
+    $("#share_dialog_background").css("display", "none");
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var myBlockXml = Blockly.Xml.domToText(xml);
+    // console.log(myBlockXml);
+    var code = editor.getValue();
+    var console_output = output_eval.getValue();
+    db.collection("share_project").doc(project_id).set({
+        block_xml: myBlockXml,
+        code: code,
+        console_output: console_output,
+        project_name: project_name,
+        edit: edit
+    })
+    .then(()=>{
+        console.log("更新に成功しました");
+    })
+    .catch((error)=>{
+        console.log(`更新に失敗しました (${error})`);
+    });
 })
