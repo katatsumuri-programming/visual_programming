@@ -803,7 +803,8 @@ window.onload = function() {
                 $("#filename").val(filename);
                 project_name = $("#filename").val();
                 edit = result["edit"]
-
+                var doc = output_eval.getDoc();
+                doc.setValue(result["console_output"]);
                 var doc = editor.getDoc();
                 doc.setValue(result["code"]);
                 welcome = false;
