@@ -104,15 +104,15 @@ header img {
     user-select: none;
 }
 header input[type="text"] {
-    height: 30px;
     width: 300px;
-    margin: 10px 10px 10px 100px;
+    margin: 5px 10px 5px 100px;
     outline: none;
     background-color: orange;
     border: 2px solid #e67e00;
     padding: 1px 5px;
     font-size: bold;
     color: white;
+    border-radius: 6px;
 }
 .menu {
     user-select: none
@@ -240,12 +240,20 @@ input[type="checkbox"]:checked + span::before {
     border-bottom: none;
 }
 #file_lists input[type="radio"]:checked + label {
-    background-color: aliceblue;
+    background-color: #fffbe6;
 }
 #open_dialog_newfile {
     text-align: left;
 }
-
+#delete {
+    vertical-align: middle;
+    float: right;
+    margin-right: 15px;
+    cursor: pointer;
+}
+#delete:hover {
+    color: orange;
+}
 
 #error_dialog_background {
     position: absolute;
@@ -285,7 +293,7 @@ input[type="checkbox"]:checked + span::before {
 
 
 
-#open, #save, #cancel, #close, #ok, #open_dialog_newfile, #create_link {
+#open, #save, #cancel, #close, #ok, #open_dialog_newfile, #create_link_btn {
     background-color: #fff;
     border: 1px solid orange;
     border-radius:5px;
@@ -335,7 +343,7 @@ input[type="checkbox"]:checked + span::before {
     border-radius: 10px;
     width: 50%;
 }
-#create_link {
+#create_link_btn {
     display: block;
 }
 .link {
@@ -378,7 +386,10 @@ input[type="checkbox"]:checked + span::before {
 #link_copy:hover {
     background-color: #eee;
 }
-
+#link_create p {
+    margin-left: 25px;
+    color: gray;
+}
 
 .selectBox{
     float: left;
