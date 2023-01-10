@@ -146,10 +146,10 @@ $(document).on("click",".tile", function(e) {
     }
   } else {
     console.log($(this).find("h3").text())
-    if (window.location.port) {
-      location.href = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/editor.html?projectName=' + $(this).find("h3").text();
+    if (window.location.hostname == "127.0.0.1") {
+      location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + $(this).find("h3").text();
     } else {
-      location.href = window.location.protocol + '//' + window.location.hostname + '/editor.html?projectName=' + $(this).find("h3").text();
+      location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + $(this).find("h3").text();
     }
   }
 
@@ -183,10 +183,10 @@ $(document).on("click",".new_file", function() {
         localStorage.removeItem(project_name);
         var setjson = JSON.stringify(data);
         localStorage.setItem(project_name, setjson);
-        if (window.location.port) {
-          location.href = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/editor.html?projectName=' + project_name;
+        if (window.location.hostname == "127.0.0.1") {
+          location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + project_name;
         } else {
-          location.href = window.location.protocol + '//' + window.location.hostname + '/editor.html?projectName=' + project_name;
+          location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + project_name;
         }
       }
     } else {
@@ -206,10 +206,10 @@ $(document).on("click",".new_file", function() {
       localStorage.removeItem(project_name);
       var setjson = JSON.stringify(data);
       localStorage.setItem(project_name, setjson);
-      if (window.location.port) {
-        location.href = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/editor.html?projectName=' + project_name;
+      if (window.location.hostname == "127.0.0.1") {
+        location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + project_name;
       } else {
-        location.href = window.location.protocol + '//' + window.location.hostname + '/editor.html?projectName=' + project_name;
+        location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + project_name;
       }
     }
   }
