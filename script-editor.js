@@ -85,6 +85,8 @@ function new_file() {
         welcome = false;
         $("#open_dialog_background").css("display", "none");
         $("#file_lists").empty();
+        $("#blocklyArea").css("pointer-events", "auto")
+        $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "auto")
         var urlSearchParams = new URLSearchParams(location.search)
         if (share_id) {
             urlSearchParams.set("shareId", share_id)
@@ -130,7 +132,7 @@ workspace.addChangeListener(function() {
             // code_block_generate = false;
         // }
     }
-    if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled") && (!welcome) && (!share_id)) {
+    if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled") && (!welcome) && (!share_id || Object.keys(localStorage).includes(project_id))) {
         var xml = Blockly.Xml.workspaceToDom(workspace);
         var myBlockXml = Blockly.Xml.domToText(xml);
         console.log(myBlockXml);
@@ -261,7 +263,7 @@ $("#execution").click(function() {
             $("#execution .material-symbols-outlined").text("play_arrow");
             play = false;
         }
-        if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled") && (!share_id) ) {
+        if ($("#auto_save").prop('checked') && !($("#filename").val() == "Untitled") && (!share_id || Object.keys(localStorage).includes(project_id)) ) {
             var xml = Blockly.Xml.workspaceToDom(workspace);
             var myBlockXml = Blockly.Xml.domToText(xml);
             // console.log(myBlockXml);
@@ -450,7 +452,7 @@ $("#save_browser").click(function(){
     // console.log(myBlockXml);
     var code = editor.getValue();
     var console_output = output_eval.getValue();
-    if (!share_id) {
+    if (!share_id || Object.keys(localStorage).includes(project_id)) {
         var data = {
             "project_name": $("#filename").val(),
             "block_xml": myBlockXml,
@@ -484,11 +486,14 @@ $("#save_browser").click(function(){
 
     if (!(file_name == "" || file_name == "undefined" || file_name == null)) {
         share_id = null;
+        edit = true;
         project_id = createUuid()
         var setjson = JSON.stringify(data);
         localStorage.setItem(project_id, setjson);
         project_name = file_name
         $("#filename").val(project_name);
+        $("#blocklyArea").css("pointer-events", "auto")
+        $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "auto")
         var urlSearchParams = new URLSearchParams(location.search)
         if (share_id) {
             urlSearchParams.set("shareId", share_id)
@@ -510,7 +515,7 @@ $("#overwrite_browser").click(function(){
     var code = editor.getValue();
     var console_output = output_eval.getValue();
 
-    if (!share_id) {
+    if (!share_id || Object.keys(localStorage).includes(project_id)) {
         var data = {
             "project_name": $("#filename").val(),
             "block_xml": myBlockXml,
@@ -552,6 +557,7 @@ $("#load_computer").click(function () {
     }
     if (value) {
         share_id = null;
+        edit = true;
         input_el = document.createElement('input');
         document.body.appendChild(input_el);
         input_el.type = "file";
@@ -580,6 +586,8 @@ $("#load_computer").click(function () {
                 $("#auto_save").prop('checked', result["settings"]["auto_save"])
                 $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
                 $("#turbo_mode").prop('checked', result["settings"]["turbo_mode"])
+                $("#blocklyArea").css("pointer-events", "auto")
+                $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "auto")
                 var urlSearchParams = new URLSearchParams(location.search)
                 if (share_id) {
                     urlSearchParams.set("shareId", share_id)
@@ -648,7 +656,7 @@ $("#filename").change(function() {
     var code = editor.getValue();
     var console_output = output_eval.getValue();
 
-    if (!share_id) {
+    if (!share_id || Object.keys(localStorage).includes(project_id)) {
         var data = {
             "project_name": $("#filename").val(),
             "block_xml": myBlockXml,
@@ -688,7 +696,7 @@ $("#filename").change(function() {
     window.alert("名前を変更しました。")
 })
 $("#auto_save, #auto_code_create, #turbo_mode").change(function(){
-    if (!share_id) {
+    if (!share_id || Object.keys(localStorage).includes(project_id)) {
         let result = JSON.parse(localStorage.getItem(project_id));
         var data = {
             "project_name": $("#filename").val(),
@@ -737,6 +745,8 @@ $("#open").click(function() {
         $("#auto_save").prop('checked', result["settings"]["auto_save"])
         $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
         $("#turbo_mode").prop('checked', result["settings"]["turbo_mode"])
+        $("#blocklyArea").css("pointer-events", "auto")
+        $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "auto")
         var urlSearchParams = new URLSearchParams(location.search)
         if (share_id) {
             urlSearchParams.set("shareId", share_id)
@@ -794,7 +804,7 @@ $(document).on('click', '#delete', function(){
 //--------------share dialog--------------
 $("#share").click(function() {
     $("#share_dialog_background").css("display", "block");
-    if (share_id && edit) {
+    if (share_id) {
         var docRef = db.collection("share_project").doc(share_id);
 
         docRef.get().then((doc)=>{
@@ -995,13 +1005,13 @@ window.onload = function() {
                             }
 
                             if (Object.keys(share_info["user_id"]).includes(uid)) {
-                                if (!share_info["user_id"][uid]["edit"]) {
+                                if (!share_info["user_id"][uid]["edit"] && !Object.keys(localStorage).includes(project_id)) {
                                     edit = false;
                                     $("#blocklyArea").css("pointer-events", "none")
                                     $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "none")
                                 }
                             } else {
-                                if (!share_info["user_id"]["unregistered"]["edit"]) {
+                                if (!share_info["user_id"]["unregistered"]["edit"] && !Object.keys(localStorage).includes(project_id)) {
                                     edit = false;
                                     $("#blocklyArea").css("pointer-events", "none")
                                     $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "none")
