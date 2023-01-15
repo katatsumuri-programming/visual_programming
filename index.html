@@ -1,8 +1,12 @@
 <head>
+  <title>Katatsumuri</title>
 	<meta charset="utf-8">
   <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 	<link rel="stylesheet" href="style-index.css">
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
 </head>
 <body>
 	<header>
@@ -15,6 +19,20 @@
       <span class="material-symbols-outlined search_input_delete">
         close
       </span>
+    </div>
+    <div id="account">
+      <span class="material-symbols-outlined" id="account_icon">
+        person
+      </span>
+      <ul class="dropdown_lists" id="account_dropdown">
+        <div id="loggingout">
+        <li class="dropdown_list"><p id="new_account">登録</p></li>
+        <li class="dropdown_list"><p id="login">ログイン</p></li>
+        </div>
+        <div id="loggingin">
+        <li class="dropdown_list"><p id="logout">ログアウト</p></li>
+        </div>
+      </ul>
     </div>
 	</header>
     <div id="projects">

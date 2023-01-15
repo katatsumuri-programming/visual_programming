@@ -490,5 +490,3 @@ input[type="checkbox"]:checked + span::before {
 .blocklyTreeRow {
     height: initial;
 }
-
-

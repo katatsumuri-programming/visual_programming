@@ -1,0 +1,27 @@
+<head>
+    <meta charset="utf-8">
+    <title>ログイン</title>
+    <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="style-login.css">
+    <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+</head>
+<body>
+    <header>
+        <img src="icon.png">
+    </header>
+    <section id="login-section">
+        <div>
+          <h1 class="title">メールアドレスでログイン</h1>
+          <!-- <input type="text" placeholder="username" id="username"> -->
+          <input type="email" placeholder="email" id="email">
+          <input type="password" placeholder="password" id="password">
+          <p id="warning"></p>
+          <button id="login">ログイン</button>
+          <button id="login-google">Googleでログイン</button>
+          <p class="register_link"><a href="register.html">新規会員登録はこちら</a></p>
+        </div>
+      </section>
+    <script src="script-login.js"></script>
+</body>

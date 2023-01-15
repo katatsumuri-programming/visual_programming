@@ -1,0 +1,36 @@
+<head>
+  <meta charset="utf-8">
+  <title>登録</title>
+  <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <link rel="stylesheet" href="style-register.css">
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+</head>
+<body>
+  <header>
+    <img src="icon.png">
+  </header>
+  <section id="register-section">
+    <div>
+      <h1 class="title">メールアドレスで登録</h1>
+      <!-- <input type="text" placeholder="username" id="username"> -->
+      <input type="email" placeholder="email" id="email">
+      <input type="password" placeholder="password" id="password">
+      <p id="warning"></p>
+      <button id="register">登録</button>
+      <button id="register-google">Googleで登録</button>
+      <p class="login_link"><a href="login.html">ログインはこちら</a></p>
+    </div>
+  </section>
+  <section id="success-section">
+    <div>
+      <h1 class="title">登録に成功しました</h1>
+      <span class="material-symbols-outlined">
+        verified
+        </span>
+      <button id="success">OK</button>
+    </div>
+  </section>
+  <script src="script-register.js"></script>
+</body>
