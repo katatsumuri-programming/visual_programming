@@ -62,10 +62,10 @@ firebase.auth().onAuthStateChanged(function(user) {
     // });
     var data = {}
     for (var i = 0; i < localStorage.length; i++) {
-      var filename = localStorage.key(i);
-      console.log(filename);
-      var result = JSON.parse(localStorage.getItem(filename));
-      data[filename] = result
+      var fileid = localStorage.key(i);
+      console.log(fileid);
+      var result = JSON.parse(localStorage.getItem(fileid));
+      data[fileid] = result
     }
     console.log(data)
     db.collection('users').doc(uid).update({
