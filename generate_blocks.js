@@ -416,7 +416,4 @@ function generateBlock(code) {
         generate_block_json(ast_json[i], 0)
         console.log("---------------------------------");
     }
-    // var xmlDom = Blocklify.JavaScript.importer.codeToDom(code, 'atomic');
-    // console.log(xmlDom)
-    // Blockly.Xml.domToWorkspace(xmlDom, workspace);
 }
