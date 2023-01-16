@@ -1622,18 +1622,3 @@ base.MethodDefinition = base.Property = (node, st, c) => {
 //   }
 return xml1;
 }
-
-//var parse1 = function(){
-//  var client = new XMLHttpRequest();
-//  client.open('GET', script1);
-//  client.onreadystatechange = function() {
-//    if(client.readyState == 4){
-//      //out1.innerHTML += client.responseText;
-//      var code1 = client.responseText;
-//      //var ast1 = acorn.parse(code1);
-//      parseCode(code1);
-//    }
-//  }
-//  client.send();
-//}
-
