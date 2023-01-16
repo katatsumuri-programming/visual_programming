@@ -9,6 +9,7 @@ var last_workspace_xml;
 var share_id = null;
 var edit = true;
 var uid = null;
+var share_uid = null;
 
 $("#auto_save").prop('checked', false)
 // var code_block_generate = false;
@@ -533,7 +534,7 @@ $("#overwrite_browser").click(function(){
         localStorage.setItem(project_id, setjson);
     }
     if (share_id && edit) {
-        db.collection("users").doc('unregistered').update({
+        db.collection("users").doc(share_uid).update({
             ["projects."+project_id]: {
                 block_xml: myBlockXml,
                 code: code,
@@ -581,7 +582,6 @@ $("#load_computer").click(function () {
                 share_id = result["share_id"]
                 var doc = output_eval.getDoc();
                 doc.setValue(result["console_output"]);
-                var doc = editor.getDoc();
                 doc.setValue(result["code"]);
                 $("#auto_save").prop('checked', result["settings"]["auto_save"])
                 $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
@@ -676,7 +676,7 @@ $("#filename").change(function() {
     }
 
     if (share_id && edit) {
-        db.collection("users").doc('unregistered').update({
+        db.collection("users").doc(share_uid).update({
             ["projects."+project_id]: {
                 block_xml: myBlockXml,
                 code: code,
@@ -811,7 +811,7 @@ $("#share").click(function() {
             if (doc.exists) {
                 $("#link_create").css("display", "none");
                 $(".share_info").css("display", "block");
-                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + share_id)
+                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?shareId=" + share_id)
             } else {
                 $("#link_create").css("display", "block");
                 $(".share_info").css("display", "none");
@@ -828,7 +828,7 @@ $("#create_link_btn").click(function() {
     // console.log(myBlockXml);
     var code = editor.getValue();
     var console_output = output_eval.getValue();
-    db.collection("users").doc('unregistered').update({
+    db.collection("users").doc(uid).update({
         ["projects."+project_id]: {
             block_xml: myBlockXml,
             code: code,
@@ -839,13 +839,13 @@ $("#create_link_btn").click(function() {
 
         db.collection("share_project").add({
             project_id: project_id,
-            user_id: {"unregistered":{"edit":edit}}
+            user_id: {[uid]:{"edit":edit}}
         })
         .then((doc) => {
             share_id = doc.id
             $("#link_create").css("display", "none");
             $(".share_info").css("display", "block");
-            $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + share_id)
+            $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?shareId=" + share_id)
 
             var xml = Blockly.Xml.workspaceToDom(workspace);
             var myBlockXml = Blockly.Xml.domToText(xml);
@@ -965,8 +965,10 @@ window.onload = function() {
             if (doc.exists) {
                 var share_info = doc.data()
                 project_id = share_info["project_id"]
-                if (Object.keys(share_info["user_id"]).includes(uid) || Object.keys(share_info["user_id"]).includes("unregistered")) {
-                    db.collection("users").doc("unregistered").get().then((doc)=>{
+                share_uid = share_info["host_user_id"]
+                console.log(share_uid)
+                if (Object.keys(share_info["user_id"]).includes(uid) || Object.keys(share_info["user_id"]).includes("unregistered") || share_uid == uid) {
+                    db.collection("users").doc(share_uid).get().then((doc)=>{
                         if (doc.exists) {
                             // console.log( doc.data() );
                             let result = doc.data()["projects"][project_id];
@@ -984,7 +986,6 @@ window.onload = function() {
                             Blockly.Xml.domToWorkspace(xml, workspace);
                             $("#filename").val(filename);
                             project_name = $("#filename").val();
-                            edit = result["edit"]
                             var doc = output_eval.getDoc();
                             doc.setValue(result["console_output"]);
                             var doc = editor.getDoc();

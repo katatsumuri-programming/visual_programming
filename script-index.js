@@ -82,16 +82,16 @@ $("#search_word").keyup(function () {
     console.log()
     $("#projects").empty();
     for (var i = 0; i < localStorage.length; i++) {
-      var filename = localStorage.key(i);
-      if (filename.indexOf(search) != -1) {
+      var fileid = localStorage.key(i);
+      if (JSON.parse(localStorage.getItem(fileid))["project_name"].indexOf(search) != -1) {
         var tile_tag = $("<div class='tile'></div>");
         var border_tag = $("<div class='border'></div>");
         var info_tag = $("<div class='info'></div>");
-        var title_tag = $("<h3></h3>");
+        var title_tag = $("<h3 class=''></h3>");
         var timestamp_tag = $("<p class='timestamp'></p>");
-        tile_tag.attr("id", filename);
-        title_tag.text(filename);
-        timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(filename))["timestamp"]));
+        tile_tag.attr("id", fileid);
+        title_tag.text(JSON.parse(localStorage.getItem(fileid))["project_name"]);
+        timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(fileid))["timestamp"]));
         info_tag.append(title_tag);
         info_tag.append(timestamp_tag);
         tile_tag.append(border_tag);
@@ -110,15 +110,15 @@ $("#search_word").keyup(function () {
       "</div>"
     ));
     for (var i = 0; i < localStorage.length; i++) {
-      var filename = localStorage.key(i);
+      var fileid = localStorage.key(i);
       var tile_tag = $("<div class='tile'></div>");
       var border_tag = $("<div class='border'></div>");
       var info_tag = $("<div class='info'></div>");
-      var title_tag = $("<h3></h3>");
+      var title_tag = $("<h3 class=''></h3>");
       var timestamp_tag = $("<p class='timestamp'></p>");
-      tile_tag.attr("id", filename);
-      title_tag.text(filename);
-      timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(filename))["timestamp"]));
+      tile_tag.attr("id", fileid);
+      title_tag.text(JSON.parse(localStorage.getItem(fileid))["project_name"]);
+      timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(fileid))["timestamp"]));
       info_tag.append(title_tag);
       info_tag.append(timestamp_tag);
       tile_tag.append(border_tag);
@@ -139,15 +139,15 @@ $(".search_input_delete").click(function () {
     "</div>"
   ));
   for (var i = 0; i < localStorage.length; i++) {
-    var filename = localStorage.key(i);
+    var fileid = localStorage.key(i);
     var tile_tag = $("<div class='tile'></div>");
     var border_tag = $("<div class='border'></div>");
     var info_tag = $("<div class='info'></div>");
-    var title_tag = $("<h3></h3>");
+    var title_tag = $("<h3 class=''></h3>");
     var timestamp_tag = $("<p class='timestamp'></p>");
-    tile_tag.attr("id", filename);
-    title_tag.text(filename);
-    timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(filename))["timestamp"]));
+    tile_tag.attr("id", fileid);
+    title_tag.text(JSON.parse(localStorage.getItem(fileid))["project_name"]);
+    timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(fileid))["timestamp"]));
     info_tag.append(title_tag);
     info_tag.append(timestamp_tag);
     tile_tag.append(border_tag);
@@ -157,13 +157,13 @@ $(".search_input_delete").click(function () {
 })
 $(document).on("click",".tile", function(e) {
   if ($(e.target).attr("class").indexOf("delete_btn") != -1) {
-    var filename = $(this).find("h3").text()
+    var fileid = $(this).attr("id")
     // console.log(filename);
 
     var delete_project = window.confirm("本当にプロジェクトを削除しますか？");
     if (delete_project) {
       $("#projects").empty();
-      localStorage.removeItem(filename);
+      localStorage.removeItem(fileid);
       $("#projects").append($(
         "<div class='new_file'>" +
           "<div class='icon'>" +
@@ -173,16 +173,16 @@ $(document).on("click",".tile", function(e) {
         "</div>"
       ));
       for (var i = 0; i < localStorage.length; i++) {
-        var filename = localStorage.key(i);
+        var fileid = localStorage.key(i);
         var tile_tag = $("<div class='tile'></div>");
         var delete_tag = $("<span class='material-symbols-outlined delete_btn'>delete</span>")
         var border_tag = $("<div class='border'></div>");
         var info_tag = $("<div class='info'></div>");
-        var title_tag = $("<h3></h3>");
+        var title_tag = $("<h3 class=''></h3>");
         var timestamp_tag = $("<p class='timestamp'></p>");
-        tile_tag.attr("id", filename);
-        title_tag.text(filename);
-        timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(filename))["timestamp"]));
+        tile_tag.attr("id", fileid);
+        title_tag.text(JSON.parse(localStorage.getItem(fileid))["project_name"]);
+        timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(fileid))["timestamp"]));
         info_tag.append(title_tag);
         info_tag.append(timestamp_tag);
         tile_tag.append(delete_tag);
@@ -192,73 +192,43 @@ $(document).on("click",".tile", function(e) {
       }
     }
   } else {
-    console.log($(this).find("h3").text())
+    console.log($(this).attr("id"))
     if (window.location.hostname == "127.0.0.1" || window.location.hostname == "localhost") {
-      location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + $(this).find("h3").text();
+      location.href = 'https://127.0.0.1:5500/editor.html?projectId=' + $(this).attr("id");
     } else {
-      location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + $(this).find("h3").text();
+      location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectId=' + $(this).attr("id");
     }
   }
 
 })
 
 $(document).on("click",".new_file", function() {
-  var same = false;
   var filename = window.prompt('ファイル名を入力してください');
   if (!(filename == "" || filename == "undefined" || filename == null)) {
-    for (var i = 0; i < localStorage.length; i++) {
-      if (localStorage.key(i) == filename) {
-        same = true;
+    project_name = filename;
+    var data = {
+      "block_xml": "<xml></xml>",
+      "code": "",
+      "console_output": "",
+      "project_name": project_name,
+      "share_id": "",
+      "timestamp": new Date(),
+      "settings": {
+        "auto_save": true,
+        "auto_generate_code": true,
+        "turbo_mode": false,
       }
-    }
-    if (same) {
-      var override = window.confirm("同じ名前のファイルがあります。上書きしますか？");
-      if (override) {
-        project_name = filename;
-        var data = {
-          "block_xml": "<xml></xml>",
-          "code": "",
-          "console_output": "",
-          "project_id": null,
-          "timestamp": new Date(),
-          "settings": {
-            "auto_save": true,
-            "auto_generate_code": true,
-            "turbo_mode": false,
-          }
-        };
-        localStorage.removeItem(project_name);
-        var setjson = JSON.stringify(data);
-        localStorage.setItem(project_name, setjson);
-        if (window.location.hostname == "127.0.0.1" || window.location.hostname == "localhost") {
-          location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + project_name;
-        } else {
-          location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + project_name;
-        }
-      }
+    };
+    var project_id = createUuid();
+    localStorage.removeItem(project_id);
+    var setjson = JSON.stringify(data);
+    localStorage.setItem(project_id, setjson);
+    if (window.location.hostname == "127.0.0.1" || window.location.hostname == "localhost") {
+      location.href = 'https://127.0.0.1:5500/editor.html?projectId=' + project_id;
     } else {
-      project_name = filename;
-      var data = {
-        "block_xml": "<xml></xml>",
-        "code": "",
-        "console_output": "",
-        "project_id": null,
-        "timestamp": new Date(),
-        "settings": {
-          "auto_save": true,
-          "auto_generate_code": true,
-          "turbo_mode": false,
-        }
-      };
-      localStorage.removeItem(project_name);
-      var setjson = JSON.stringify(data);
-      localStorage.setItem(project_name, setjson);
-      if (window.location.hostname == "127.0.0.1" || window.location.hostname == "localhost") {
-        location.href = 'https://127.0.0.1:5500/editor.html?projectName=' + project_name;
-      } else {
-        location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectName=' + project_name;
-      }
+      location.href = 'https://katatsumuri-programming.github.io/visual_programming/editor.html?projectId=' + project_id;
     }
+
   }
 
 })
@@ -274,16 +244,16 @@ window.onload = function() {
     "</div>"
   ));
   for (var i = 0; i < localStorage.length; i++) {
-    var filename = localStorage.key(i);
+    var fileid = localStorage.key(i);
     var tile_tag = $("<div class='tile'></div>");
     var delete_tag = $("<span class='material-symbols-outlined delete_btn'>delete</span>")
     var border_tag = $("<div class='border'></div>");
     var info_tag = $("<div class='info'></div>");
-    var title_tag = $("<h3></h3>");
+    var title_tag = $("<h3 class=''></h3>");
     var timestamp_tag = $("<p class='timestamp'></p>");
-    tile_tag.attr("id", filename);
-    title_tag.text(filename);
-    timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(filename))["timestamp"]));
+    tile_tag.attr("id", fileid);
+    title_tag.text(JSON.parse(localStorage.getItem(fileid))["project_name"]);
+    timestamp_tag.text(elapsedTime(JSON.parse(localStorage.getItem(fileid))["timestamp"]));
     info_tag.append(title_tag);
     info_tag.append(timestamp_tag);
     tile_tag.append(delete_tag);
