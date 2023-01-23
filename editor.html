@@ -573,17 +573,30 @@
         <p>リンクを知っている全員がアクセスできる状態になります</p>
       </div>
       <div class="share_info">
-        <!-- <div class="selectBox">
-          <div class="selectBox__output material-symbols-outlined"></div>
+        <div class="selectBox share_range">
+          <div class="selectBox__output material-symbols-outlined share_range_output"></div>
           <div class="selectBox__selector">
-            <div class="selectBox__selectorItem" data-select="editor">編集者</div>
-            <div class="selectBox__selectorItem" data-select="reader">閲覧者</div>
+            <div class="selectBox__selectorItem shareRange_selectorItem" data-select="everyone">リンクを知っている全員</div>
+            <div class="selectBox__selectorItem shareRange_selectorItem" data-select="limit">制限付き</div>
           </div>
-          <select name="role">
-            <option value="editor">編集者</option>
-            <option value="reader">閲覧者</option>
-          </select>
-        </div> -->
+        </div>
+        <div class="selectBox authority">
+          <div class="selectBox__output material-symbols-outlined authority_output"></div>
+          <div class="selectBox__selector">
+            <div class="selectBox__selectorItem authority_selectorItem" data-select="editor">編集者</div>
+            <div class="selectBox__selectorItem authority_selectorItem" data-select="reader">閲覧者</div>
+          </div>
+        </div>
+        <div class="share_user">
+          <p class="add_user">
+            <input type="text" placeholder="ユーザーID" id="add_user_id">
+            <button id="add_user_btn">追加</button>
+          </p>
+          <p class="user_list_label">アクセスできるユーザー</p>
+          <div class="share_user_list">
+
+          </div>
+        </div>
         <div class="link">
           <p class="link_field">https://xxxx</p>
           <button id="link_copy">

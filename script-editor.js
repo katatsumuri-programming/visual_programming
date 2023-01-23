@@ -10,6 +10,7 @@ var share_id = null;
 var edit = true;
 var uid = null;
 var share_uid = null;
+var share_user_list = {}
 
 $("#auto_save").prop('checked', false)
 // var code_block_generate = false;
@@ -805,13 +806,54 @@ $(document).on('click', '#delete', function(){
 $("#share").click(function() {
     $("#share_dialog_background").css("display", "block");
     if (share_id) {
+        share_user_list = {"unregistered": {"edit":false}}
         var docRef = db.collection("share_project").doc(share_id);
 
         docRef.get().then((doc)=>{
             if (doc.exists) {
+                var result = doc.data();
                 $("#link_create").css("display", "none");
                 $(".share_info").css("display", "block");
                 $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?shareId=" + share_id)
+                if (Object.keys(result["user_id"]).includes("unregistered")) {
+                    $(".shareRange_selectorItem[data-select='everyone']").click();
+                    if (result["user_id"]["unregistered"]["edit"]) {
+                        $(".authority_output").text("編集者");
+                    } else {
+                        $(".authority_output").text("閲覧者");
+                    }
+                    $('.share_range_output').removeClass('open');
+                } else {
+                    $(".shareRange_selectorItem[data-select='limit']").click();
+                    $('.share_range_output').removeClass('open');
+                    $(".share_user_list").empty()
+                    for (var i = 0; i < Object.keys(result["user_id"]).length; i++) {
+                        var add_user_id = Object.keys(result["user_id"])[i]
+                        if (result["user_id"][add_user_id]["edit"]) {
+                            var authority = "編集者"
+                        } else {
+                            var authority = "閲覧者"
+                        }
+                        var user_item_tag = $("<div class='share_user_item'></div>")
+                        var close_tag = $("<span class='material-symbols-outlined share_user_delete'>close</span>")
+                        var user_id_tag = $("<p class='share_user_id'></p>")
+                        var select_tag = $(
+                            "<div class='selectBox user_authority'>" +
+                                "<div class='selectBox__output material-symbols-outlined authority_output'>" + authority + "</div>" +
+                                "<div class='selectBox__selector authority'>" +
+                                    "<div class='selectBox__selectorItem userAuthority_selectorItem' data-select='editor'>編集者</div>" +
+                                    "<div class='selectBox__selectorItem userAuthority_selectorItem' data-select='reader'>閲覧者</div>" +
+                                "</div>" +
+                            "</div>"
+                        );
+                        user_id_tag.text(add_user_id)
+                        user_item_tag.append(close_tag);
+                        user_item_tag.append(user_id_tag);
+                        user_item_tag.append(select_tag);
+                        user_item_tag.attr("id", add_user_id);
+                        $(".share_user_list").append(user_item_tag);
+                    }
+                }
             } else {
                 $("#link_create").css("display", "block");
                 $(".share_info").css("display", "none");
@@ -888,20 +930,70 @@ $("#ok").click(function() {
     // var code = editor.getValue();
     // var console_output = output_eval.getValue();
 
-    // db.collection("users").doc('unregistered').update({
-    //     ["projects."+project_id]: {
-    //         block_xml: myBlockXml,
-    //         code: code,
-    //         console_output: console_output,
-    //         project_name: project_name,
-    //     }
-    // })
-    // .then(()=>{
-    //     console.log("更新に成功しました");
-    // })
-    // .catch((error)=>{
-    //     console.log(`更新に失敗しました (${error})`);
-    // });
+    var authority;
+    var data = {}
+    if ($(".share_range_output").text() == "リンクを知っている全員") {
+        if ($(".authority_output").text() == "編集者") {
+            authority = true
+        } else {
+            authority = false
+        }
+        data = {
+            "unregistered":{
+                "edit": authority
+            }
+
+        }
+    } else {
+        var user_list = $(".share_user_list").children();
+        for (var i = 0; i < user_list.length; i++) {
+            console.log($(user_list[i]).attr("id"));
+            console.log($(user_list[i]).find(".authority_output").text())
+            if ($(user_list[i]).find(".authority_output").text() == "編集者") {
+                data[$(user_list[i]).attr("id")] = true;
+            } else {
+                data[$(user_list[i]).attr("id")] = false;
+            }
+        }
+    }
+    console.log(data)
+    /*
+    if($(".authority_output").text() == "編集者") {
+        authority = true;
+    } else {
+        authority = false;
+    }
+    if ($(".share_range_output").text() == "リンクを知っている全員") {
+        data = {
+            "user_id": {
+                "unregistered":{
+                    "edit": authority
+                }
+            }
+        }
+    } else {
+        data = {
+            "user_id": {
+                "unregistered":{
+                    "edit": authority
+                }
+            }
+        }
+    }
+    */
+
+    db.collection("share_project").doc(share_id).update(
+        {
+            "user_id":data
+        }
+    )
+    .then(()=>{
+        console.log("更新に成功しました");
+    })
+    .catch((error)=>{
+        console.log(`更新に失敗しました (${error})`);
+    });
+
 })
 
 //--------------------------------------------------------------load process--------------------------------------------------------------------
@@ -1004,18 +1096,19 @@ window.onload = function() {
                                 $("#auto_code_create").prop('checked', true)
                                 $("#turbo_mode").prop('checked', false)
                             }
-
                             if (Object.keys(share_info["user_id"]).includes(uid)) {
                                 if (!share_info["user_id"][uid]["edit"] && !Object.keys(localStorage).includes(project_id)) {
                                     edit = false;
                                     $("#blocklyArea").css("pointer-events", "none")
                                     $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "none")
+                                    $(".selectBox").css("display", "none")
                                 }
                             } else {
                                 if (!share_info["user_id"]["unregistered"]["edit"] && !Object.keys(localStorage).includes(project_id)) {
                                     edit = false;
                                     $("#blocklyArea").css("pointer-events", "none")
                                     $(".cm-s-darcula:nth-of-type(3)").css("pointer-events", "none")
+                                    $(".selectBox").css("display", "none")
                                 }
                             }
                             setTimeout(() => {welcome = false;}, 500);
@@ -1043,7 +1136,15 @@ firebase.auth().onAuthStateChanged(function(user) {
         uid = "unregistered";
     }
 });
-
+  firebase.auth().fetchProvidersForEmail("y_kantaro@outlook.jp")
+  .then(providers => {
+    if (providers.length === 0) {
+      // this email hasn't signed up yet
+    } else {
+        console.log(providers)
+      // has signed up
+    }
+  });
 // window.onbeforeunload = function(e) {
 //     var xml = Blockly.Xml.workspaceToDom(workspace);
 //     var myBlockXml = Blockly.Xml.domToText(xml);
@@ -1066,39 +1167,94 @@ firebase.auth().onAuthStateChanged(function(user) {
 //     });
 
 // }
+$(document).on('click touchend', function(event) {
+    if (!$(event.target).closest(".selectBox__selectorItem").length) {
+        $('.selectBox__selector').slideUp();
 
-// $('.selectBox__output').each(function () {
-//     const defaultText = $(this).next('.selectBox__selector').children('.selectBox__selectorItem:first-child').text()
-//     $(this).text(defaultText);
-// })
+        if ($(".authority_output").hasClass('open')) {
+            $('.authority_output').toggleClass('open');
+        }
+        if ($(".share_range_output").hasClass('open')) {
+            $('.share_range_output').toggleClass('open');
+        }
+    }
+});
+$('.selectBox__output').each(function () {
+    const defaultText = $(this).next('.selectBox__selector').children('.selectBox__selectorItem:first-child').text()
+    $(this).text(defaultText);
+})
 
-// //出力の枠をクリックした時の動作
-// $('.selectBox__output').on('click', function (e) {
-//     e.stopPropagation();
-//     if ($(this).hasClass('open')) {
-//         $(this).next('.selectBox__selector').slideUp();
-//     } else {
-//         $(this).next('.selectBox__selector').slideDown();
-//     }
-//     $(this).toggleClass('open');
-// });
+//出力の枠をクリックした時の動作
+$(document).on('click', '.selectBox__output', function(e){
+    e.stopPropagation();
+    if ($(this).hasClass('open')) {
+        $(this).next('.selectBox__selector').slideUp();
+    } else {
+        $(this).next('.selectBox__selector').slideDown();
+    }
+    $(this).toggleClass('open');
+});
 
-// //選択肢をクリックした時の動作
-// $('.selectBox__selectorItem').on('click', function () {
-//     $('.selectBox__output').toggleClass('open');
-//     const selectVal = $(this).data('select');
-//     const selectText = $(this).text();
-//     $(this).parent('.selectBox__selector').prev('.selectBox__output').text(selectText);
-//     $(this).parent('.selectBox__selector').slideUp();
-//     $(this).parents('.selectBox__output').slideDown();
-//     $(this).parent('.selectBox__selector').next('select').val(selectVal);
-//     console.log($(this).attr("data-select"))
-//     if ($(this).attr("data-select") == "editor") {
-//         edit = true;
-//     } else {
-//         edit = false;
-//     }
-// });
-
-
-
+//選択肢をクリックした時の動作
+$(document).on('click', '.shareRange_selectorItem', function(){
+    $(this).parents('.selectBox').find(".selectBox__output").toggleClass('open');
+    const selectVal = $(this).data('select');
+    const selectText = $(this).text();
+    $(this).parent('.selectBox__selector').prev('.selectBox__output').text(selectText);
+    $(this).parent('.selectBox__selector').slideUp();
+    $(this).parents('.selectBox__output').slideDown();
+    $(this).parent('.selectBox__selector').next('select').val(selectVal);
+    if ($(this).attr("data-select") == "limit") {
+        $(".share_user").css("display", "block");
+        $(".authority").css("display", "none");
+    } else {
+        $(".share_user").css("display", "none");
+        $(".authority").css("display", "block");
+    }
+});
+$(document).on('click', '.userAuthority_selectorItem', function(){
+    $(this).parents('.selectBox').find(".selectBox__output").toggleClass('open');
+    const selectVal = $(this).data('select');
+    const selectText = $(this).text();
+    $(this).parent('.selectBox__selector').prev('.selectBox__output').text(selectText);
+    $(this).parent('.selectBox__selector').slideUp();
+    $(this).parents('.selectBox__output').slideDown();
+    $(this).parent('.selectBox__selector').next('select').val(selectVal);
+});
+$('.Authority_selectorItem').click(function(){
+    $(this).parents('.selectBox').find(".selectBox__output").toggleClass('open');
+    const selectVal = $(this).data('select');
+    const selectText = $(this).text();
+    $(this).parent('.selectBox__selector').prev('.selectBox__output').text(selectText);
+    $(this).parent('.selectBox__selector').slideUp();
+    $(this).parents('.selectBox__output').slideDown();
+    $(this).parent('.selectBox__selector').next('select').val(selectVal);
+});
+$(document).on('click', '.share_user_delete', function() {
+    $(this).parent().remove();
+})
+$("#add_user_btn").click(function () {
+    var add_user_id = $("#add_user_id").val();
+    if (add_user_id) {
+        console.log(add_user_id)
+        var user_item_tag = $("<div class='share_user_item'></div>")
+        var close_tag = $("<span class='material-symbols-outlined share_user_delete'>close</span>")
+        var user_id_tag = $("<p class='share_user_id'></p>")
+        var select_tag = $(
+            "<div class='selectBox user_authority'>" +
+                "<div class='selectBox__output material-symbols-outlined open authority_output'>編集者</div>" +
+                "<div class='selectBox__selector authority'>" +
+                    "<div class='selectBox__selectorItem userAuthority_selectorItem' data-select='editor'>編集者</div>" +
+                    "<div class='selectBox__selectorItem userAuthority_selectorItem' data-select='reader'>閲覧者</div>" +
+                "</div>" +
+            "</div>"
+        );
+        user_id_tag.text(add_user_id)
+        user_item_tag.append(close_tag);
+        user_item_tag.append(user_id_tag);
+        user_item_tag.append(select_tag);
+        user_item_tag.attr("id", add_user_id);
+        $(".share_user_list").append(user_item_tag);
+        $("#add_user_id").val("")
+    }
+})

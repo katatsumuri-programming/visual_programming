@@ -124,13 +124,12 @@ header input[type="text"] {
 }
 .menu_list p{
     cursor: pointer;
-
     height: 50px;
     margin: 0;
     line-height: 50px;
     font-size: 15px;
-
     padding: 0 25px;
+    overflow: hidden;
 }
 
 .menu_list p:hover {
@@ -426,11 +425,21 @@ input[type="checkbox"]:checked + span::before {
 .selectBox__selector{
     display: none;
     position: absolute;
-    width: 150px;
     border: 1px solid #ddd;
     background-color: #fff;
     z-index: 10;
-
+}
+.share_range {
+    width: 250px;
+}
+.share_range .selectBox__selector {
+    width: 250px
+}
+.authority {
+    width: 150px;
+}
+.authority .selectBox__selector {
+    width: 150px
 }
 .selectBox__selectorItem{
     padding: .75em;
@@ -442,7 +451,63 @@ input[type="checkbox"]:checked + span::before {
     background-color: #e67e00;
     color:#fff;
 }
-
+#add_user_id {
+    font-size: 15px;
+    line-height: 35px;
+    outline: none;
+    border: 1px solid #ccc;
+    padding: 5px 20px;
+    border-radius: 10px;
+    margin: 20px 10px;
+    width: 70%;
+}
+#add_user_btn {
+    background-color: #fff;
+    border: 1px solid orange;
+    border-radius: 5px;
+    font-size: 15px;
+    line-height: 25px;
+    padding: 10px 20px;
+    margin: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.user_list_label {
+    margin-left: 10px;
+}
+.share_user_item {
+    margin: 10px;
+}
+.share_user_delete {
+    line-height: 30px;
+    height: 30px;
+    width: 30px;
+    margin: 10px;
+    margin-left: 0;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.share_user_delete:hover {
+    background-color: #eee;
+}
+.share_user_id {
+    font-size: 20px;
+    margin: 0;
+    display: inline-block;
+    line-height: 30px;
+    margin: 10px;
+}
+.user_authority {
+    margin: 0;
+    display: inline-block;
+    float: right;
+}
+.user_authority .authority_output {
+    height: 18px;
+    line-height: 18px;
+}
 
 #blocklyDiv {
     width: 100%;
