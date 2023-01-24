@@ -73,8 +73,16 @@ $("#register-google").click(function() {
 $("#success").click(function() {
     if (getParam("source") == "index" || !getParam("source")) {
         window.location = "index.html";
-    } else {
-        window.location = "editor.html?projectName=" + getParam("source");
+    } else if (getParam("source") == "editor"){
+        var url = "editor.html";
+        if (getParam("projectId") && getParam("shareId")) {
+            url += "?projectId=" + getParam("projectId") + "&shareId=" + getParam("shareId")
+        } else if (getParam("projectId") && !getParam("shareId")) {
+            url += "?projectId=" + getParam("projectId")
+        } else if (!getParam("projectId") && getParam("shareId")) {
+            url += "?shareId=" + getParam("shareId")
+        }
+        window.location = url;
     }
 
 })

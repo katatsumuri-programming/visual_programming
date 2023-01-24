@@ -17,6 +17,7 @@ $("#auto_save").prop('checked', false)
 $("#open_dialog_background").css("display", "none");
 $("#error_dialog_background").css("display", "none");
 $("#share_dialog_background").css("display", "none");
+$("#uid_dialog_background").css("display", "none");
 Blockly.HSV_SATURATION = 0.9;
 Blockly.HSV_VALUE = 0.7;
 Blockly.Flyout.prototype.autoClose=false;
@@ -395,6 +396,9 @@ $(document).on('click touchend', function(event) {
     if (!$(event.target).closest('#edit_menu').length) {
         $("#edit_dropdown").css('display', 'none');
     }
+    if (!$(event.target).closest('#account_icon').length) {
+        $('#account_dropdown').css('display', 'none');
+    }
 });
 
 $("#new_file").click(function() {
@@ -716,7 +720,37 @@ $("#auto_save, #auto_code_create, #turbo_mode").change(function(){
         localStorage.setItem(project_id, setjson);
     }
 })
+$("#account_icon").click(function() {
+    $("#account_dropdown").toggle();
+})
 
+$("#new_account").click(function () {
+    var url = "register.html?source=editor";
+    if (project_id) {
+        url += "&projectId=" + project_id;
+    }
+    if (share_id) {
+        url += "&shareId=" + share_id;
+    }
+    window.location = url;
+})
+$("#login").click(function () {
+    var url = "login.html?source=editor";
+    if (project_id) {
+        url += "&projectId=" + project_id;
+    }
+    if (share_id) {
+        url += "&shareId=" + share_id;
+    }
+    window.location = url;
+})
+$("#logout").click(function () {
+    var logout = window.confirm("本当にログアウトしますか？");
+    if (logout) {
+        firebase.auth().signOut();
+        window.location.reload();
+    }
+})
 //--------------------------------------------------------------dialog process------------------------------------------------------------------
 
 //--------------open dialog--------------
@@ -996,6 +1030,21 @@ $("#ok").click(function() {
 
 })
 
+$("#show_uid").click(function(){
+    $(".uid_field").text(uid)
+    $("#uid_dialog_background").css("display", "block")
+})
+$("#uid_ok").click(function() {
+    $("#uid_dialog_background").css("display", "none")
+})
+$("#uid_copy").click(function() {
+    text = $(".uid_field").text()
+    if (navigator.clipboard == undefined) {
+        window.clipboardData.setData("Text", text);
+    } else {
+        navigator.clipboard.writeText(text);
+    }
+})
 //--------------------------------------------------------------load process--------------------------------------------------------------------
 
 window.onload = function() {
@@ -1130,21 +1179,18 @@ window.onload = function() {
 
 
 firebase.auth().onAuthStateChanged(function(user) {
+    console.log(user)
     if(user) {
         uid = user.uid;
+
+        $("#loggingout").css("display", "none");
+        $("#loggingin").css("display", "block");
     } else {
         uid = "unregistered";
+        $("#loggingout").css("display", "block");
+        $("#loggingin").css("display", "none");
     }
 });
-  firebase.auth().fetchProvidersForEmail("y_kantaro@outlook.jp")
-  .then(providers => {
-    if (providers.length === 0) {
-      // this email hasn't signed up yet
-    } else {
-        console.log(providers)
-      // has signed up
-    }
-  });
 // window.onbeforeunload = function(e) {
 //     var xml = Blockly.Xml.workspaceToDom(workspace);
 //     var myBlockXml = Blockly.Xml.domToText(xml);

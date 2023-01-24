@@ -105,6 +105,21 @@
         share
         </span>
     </div>
+    <div id="account">
+      <span class="material-symbols-outlined" id="account_icon">
+        person
+      </span>
+      <ul class="dropdown_lists" id="account_dropdown">
+        <div id="loggingout">
+        <li class="dropdown_list"><p id="new_account">登録</p></li>
+        <li class="dropdown_list"><p id="login">ログイン</p></li>
+        </div>
+        <div id="loggingin">
+        <li class="dropdown_list"><p id="show_uid">ユーザーIDを取得</p></li>
+        <li class="dropdown_list"><p id="logout">ログアウト</p></li>
+        </div>
+      </ul>
+    </div>
   </header>
   <div id="blocklyArea">
     <div id="blocklyDiv" style="position: absolute"></div>
@@ -608,6 +623,22 @@
       </div>
       <div class="buttons">
         <button id="ok">OK</button>
+      </div>
+    </div>
+  </div>
+  <div id="uid_dialog_background">
+    <div id="uid_dialog">
+      <h2>ユーザーID</h2>
+      <div class="uid">
+        <p class="uid_field">xxxx</p>
+        <button id="uid_copy">
+          <span class="material-symbols-outlined">
+            content_copy
+          </span>
+        </button>
+      </div>
+      <div class="buttons">
+        <button id="uid_ok">OK</button>
       </div>
     </div>
   </div>
