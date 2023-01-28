@@ -72,6 +72,9 @@ firebase.auth().onAuthStateChanged(function(user) {
       'projects': data,
     })
 
+  } else {
+    $("#loggingout").css("display", "block");
+    $("#loggingin").css("display", "none");
   }
 });
 
