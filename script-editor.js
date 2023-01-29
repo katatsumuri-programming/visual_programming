@@ -554,6 +554,22 @@ $("#overwrite_browser").click(function(){
             console.log(`更新に失敗しました (${error})`);
           });
     }
+    if (uid && !share_id) {
+        db.collection("users").doc(uid).update({
+            ["projects."+project_id]: {
+                block_xml: myBlockXml,
+                code: code,
+                console_output: console_output,
+                project_name: project_name,
+            }
+        })
+          .then(()=>{
+            console.log("更新に成功しました");
+          })
+          .catch((error)=>{
+            console.log(`更新に失敗しました (${error})`);
+          });
+    }
     save = true;
 })
 $("#load_computer").click(function () {
@@ -887,6 +903,11 @@ $("#share").click(function() {
                         user_item_tag.attr("id", add_user_id);
                         $(".share_user_list").append(user_item_tag);
                     }
+                }
+                if (Object.keys(localStorage).includes(result["project_id"]) || (result["host_user_id"] == uid && !result["host_user_id"] == "unregistered")) {
+                    $(".selectBox").css("pointer-events", "auto");
+                } else {
+                    $(".selectBox").css("pointer-events", "none");
                 }
             } else {
                 $("#link_create").css("display", "block");
