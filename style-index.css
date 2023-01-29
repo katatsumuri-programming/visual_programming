@@ -1,10 +1,13 @@
+:root {
+    --main-color: orange
+}
 body {
     margin: 0;
 }
 header {
     width: 100%;
     height: 50px;
-    background-color: orange;
+    background-color: var(--main-color);
     display: flex;
 }
 header img {
@@ -56,7 +59,7 @@ header img {
     position: absolute;
     border-radius: 0 0 20px 20px;
     display: none;
-    background-color: orange;
+    background-color: var(--main-color);
     width: 200px;
     z-index: 999;
     right: 20px;
@@ -97,7 +100,7 @@ hr {
     width: 10px;
     border-radius: 5px;
     margin: 10px 20px 10px 0;
-    background-color: orange;
+    background-color: var(--main-color);
     transition: all 0.2s;
 }
 .delete_btn {
@@ -125,7 +128,7 @@ hr {
 }
 .tile:hover {
     color: white;
-    background-color:orange;
+    background-color:var(--main-color);
 
 }
 .tile:hover .border {
@@ -158,7 +161,7 @@ hr {
     transition: all 0.2s;
 }
 .new_file:hover {
-    background-color:orange;
+    background-color:var(--main-color);
     color: white;
 }
 .icon {
