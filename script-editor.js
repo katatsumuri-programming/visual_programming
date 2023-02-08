@@ -864,7 +864,7 @@ $("#share").click(function() {
                 var result = doc.data();
                 $("#link_create").css("display", "none");
                 $(".share_info").css("display", "block");
-                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?shareId=" + share_id)
+                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/editor.html?shareId=" + share_id)
                 if (Object.keys(result["user_id"]).includes("unregistered")) {
                     $(".shareRange_selectorItem[data-select='everyone']").click();
                     if (result["user_id"]["unregistered"]["edit"]) {
@@ -935,6 +935,7 @@ $("#create_link_btn").click(function() {
     }).then((doc) => {
 
         db.collection("share_project").add({
+            host_user_id: uid,
             project_id: project_id,
             user_id: {[uid]:{"edit":edit}}
         })
@@ -942,7 +943,7 @@ $("#create_link_btn").click(function() {
             share_id = doc.id
             $("#link_create").css("display", "none");
             $(".share_info").css("display", "block");
-            $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?shareId=" + share_id)
+            $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/editor.html?shareId=" + share_id)
 
             var xml = Blockly.Xml.workspaceToDom(workspace);
             var myBlockXml = Blockly.Xml.domToText(xml);
@@ -1193,7 +1194,7 @@ window.onload = function() {
             }
         })
         .catch( (error) => {
-            alert(`データを取得できませんでした (${error})`);
+            alert(`データを取得できませんでした load shareid(${error})`);
         });
     }
 }
