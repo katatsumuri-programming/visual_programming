@@ -164,6 +164,13 @@
       </block>
     </category>
     <category name="ループ" colour="%{BKY_LOOPS_HUE}" css-icon="customIcon">
+      <block type="simple_for">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
       <block type="controls_for">
         <value name="FROM">
           <shadow type="math_number">
@@ -298,6 +305,16 @@
           </shadow>
         </value>
       </block>
+      <block type="question_block">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc?</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="variables_get">
+        <field name="VAR">answer</field>
+      </block>
       <block type="text"></block>
       <block type="text_join">
         <value name="ADD0">
@@ -430,6 +447,7 @@
           </shadow>
         </value>
       </block>
+
     </category>
     <category name="配列" colour="%{BKY_LISTS_HUE}" css-icon="customIcon">
       <block type="lists_create_empty"></block>

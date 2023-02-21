@@ -23,3 +23,22 @@ Blockly.JavaScript['javascript_order'] = function(block) {
   var code = text_code + '\n';
   return code;
 };
+
+Blockly.JavaScript['question_block'] = function(block) {
+  var value_question = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  var variable_answer = Blockly.JavaScript.nameDB_.getName(
+    block.getFieldValue('VAR'), Blockly.Names.NameType.VARIABLE);
+  console.log(block.getFieldValue('VAR'))
+  // TODO: Assemble JavaScript into code variable.
+  var code = variable_answer + ' = window.prompt(' + value_question +');\n';
+  return code;
+};
+
+Blockly.JavaScript['simple_for'] = function(block) {
+  var variable_var = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('VAR'), Blockly.Names.NameType.VARIABLE);
+  var value_num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC);
+  var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
+  // TODO: Assemble JavaScript into code variable.
+  var code = 'for (var ' + variable_var + ' = 1; ' + variable_var + ' <= ' + value_num + '; ' + variable_var + '++) {\n' + statements_do + '}\n';
+  return code;
+};

@@ -1326,3 +1326,7 @@ $("#add_user_btn").click(function () {
         $("#add_user_id").val("")
     }
 })
+
+//TODO: ～を聞くを格納するブロック
+//      ループ回数
+//      コードからブロックを強化
