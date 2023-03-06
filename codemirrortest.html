@@ -1,0 +1,15 @@
+<head>
+    <script src="codemirror.js"></script>
+    <link rel="stylesheet" href="codemirror.css">
+</head>
+<body>
+    <textarea id="editor"></textarea>
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("editor"),
+{
+    mode: "javascript",
+    lineNumbers: true,
+});
+editor.save();
+    </script>
+</body>
