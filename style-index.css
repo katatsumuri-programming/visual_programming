@@ -1,10 +1,13 @@
+:root {
+    --main-color: orange
+}
 body {
     margin: 0;
 }
 header {
     width: 100%;
     height: 50px;
-    background-color: orange;
+    background-color: var(--main-color);
     display: flex;
 }
 header img {
@@ -38,12 +41,66 @@ header img {
 .search_input_delete {
     cursor: pointer;
 }
+#account {
+    width: 50px;
+    text-align: center;
+    cursor: pointer;
+    margin: 0 30px 0 auto;
+    color: white;
+}
+#account:hover {
+    color: yellow;
+}
+#account_icon {
+    line-height: 50px;
+}
+.dropdown_lists {
+    padding-left:0;
+    position: absolute;
+    border-radius: 0 0 20px 20px;
+    display: none;
+    background-color: var(--main-color);
+    width: 200px;
+    z-index: 999;
+    right: 20px;
+}
+.dropdown_list{
+    /* display:none; */
+    position: relative;
+}
+#login, #logout {
+    border-radius: 0 0 20px 20px;
+}
+.dropdown_list p {
+    padding: 10px;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    cursor: pointer;
+    height: 50px;
+    margin: 0;
+    line-height: 50px;
+    font-size: 15px;
+    padding: 0 25px;
+}
+.dropdown_list p:hover {
+    background-color:#e67e00;
+}
+ul, li {
+    list-style: none;
+    margin: 0;
+}
+
+hr {
+    border: 1px solid #e67e00;
+    margin: 0;
+}
 
 .border {
     width: 10px;
     border-radius: 5px;
     margin: 10px 20px 10px 0;
-    background-color: orange;
+    background-color: var(--main-color);
     transition: all 0.2s;
 }
 .delete_btn {
@@ -71,7 +128,7 @@ header img {
 }
 .tile:hover {
     color: white;
-    background-color:orange;
+    background-color:var(--main-color);
 
 }
 .tile:hover .border {
@@ -104,7 +161,7 @@ header img {
     transition: all 0.2s;
 }
 .new_file:hover {
-    background-color:orange;
+    background-color:var(--main-color);
     color: white;
 }
 .icon {
