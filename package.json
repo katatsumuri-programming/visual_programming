@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "acorn": "^8.8.1",
-    "blockly": "^9.2.0"
+    "google-closure-library": "^20230206.0.0"
   }
 }
