@@ -39,6 +39,17 @@ Blockly.JavaScript['simple_for'] = function(block) {
   var value_num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC);
   var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
   // TODO: Assemble JavaScript into code variable.
-  var code = 'for (var ' + variable_var + ' = 1; ' + variable_var + ' <= ' + value_num + '; ' + variable_var + '++) {\n' + statements_do + '}\n';
+  var code = 'for (' + variable_var + ' = 1; ' + variable_var + ' <= ' + value_num + '; ' + variable_var + '++) {\n' + statements_do + '}\n';
+  return code;
+};
+
+Blockly.JavaScript['start_block'] = function(block) {
+  var statements_do_raw = Blockly.JavaScript.statementToCode(block, 'DO');
+  var statements_do =""
+  for (var i = 0; i < statements_do_raw.split('\n').length; i++) {
+    statements_do += statements_do_raw.split('\n')[i].replace("  ", "") + "\n"
+  }
+  // TODO: Assemble JavaScript into code variable.
+  var code = statements_do;
   return code;
 };
