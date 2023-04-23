@@ -122,7 +122,7 @@ var workspace = Blockly.inject('blocklyArea',
         },
     }
 );
-
+workspace.addChangeListener(Blockly.Events.disableOrphans);
 workspace.addChangeListener(function() {
     save = false;
     if ($("#auto_code_create").prop('checked') && (!welcome)) {
