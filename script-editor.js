@@ -181,7 +181,8 @@ $("#create_code").click(function () {
 $("#create_block").click(function () {
     try {
         var code = editor.getValue();
-        var xml = parseCode(code);
+        var xml = generateBlock(code);
+        // var xml = parseCode(code);
         last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
         workspace.clear()
         Blockly.Xml.appendDomToWorkspace(xml, workspace)
