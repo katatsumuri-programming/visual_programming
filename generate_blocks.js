@@ -401,6 +401,50 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "_attributes": {"type": "lists_reverse"},
                                 "value": {"_attributes": {"name": "LIST"},"block":generate_block_json(ast_json.callee.object)["block"]}
                             }
+                        } else if (ast_json.callee.object.name == "Math") {
+                            type = "int";
+                            if (ast_json.callee.property.name == "pow") {
+                                json_block = {
+                                    "_attributes": {"type": "math_arithmetic"},
+                                    "field": {"_attributes": {"name": "OP"},"_text":"POWER"},
+                                    "value":[
+                                        {
+                                            "_attributes": {"name": "A"},
+                                            "block":generate_block_json(ast_json.arguments[0])["block"]
+                                        },
+                                        {
+                                            "_attributes": {"name": "B"},
+                                            "block":generate_block_json(ast_json.arguments[1])["block"]
+                                        }
+                                    ]
+                                }
+                            } else {
+                                var op;
+                                switch (ast_json.callee.property.name) {
+                                    case "sqrt":
+                                        op = "ROOT"
+                                        break;
+                                    case "abs":
+                                        op = "ABS"
+                                        break;
+                                    case "log":
+                                        op = "LN"
+                                        break;
+                                    case "exp":
+                                        op = "EXP"
+                                        break;
+                                    default:
+                                        throw new Error("exceptional block")
+                                }
+                                json_block = {
+                                    "_attributes": {"type": "math_single"},
+                                    "field": {"_attributes": {"name": "OP"},"_text":op},
+                                    "value": {
+                                        "_attributes": {"name": "NUM"},
+                                        "block":generate_block_json(ast_json.arguments[0])["block"]
+                                    }
+                                }
+                            }
                         } else {
                             throw new Error("exceptional block")
                         }
