@@ -81,3 +81,15 @@ Blockly.Blocks['simple_for'] = {
     this.setHelpUrl("");
   }
 }
+
+Blockly.Blocks['start_block'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("スタート");
+    this.appendStatementInput("DO")
+        .setCheck(null);
+    this.setColour(120);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};

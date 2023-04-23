@@ -152,7 +152,7 @@ var workspace = Blockly.inject('blocklyArea',
         },
     }
 );
-
+workspace.addChangeListener(Blockly.Events.disableOrphans);
 workspace.addChangeListener(function() {
     save = false;
     if ($("#auto_code_create").prop('checked') && (!welcome)) {
@@ -208,24 +208,26 @@ $("#create_code").click(function () {
     editor.save();
 });
 $("#create_block").click(function () {
-    try {
+    // try {
         var code = editor.getValue();
-        var xml = parseCode(code);
-        last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
+        var xml = generateBlock(code);
+        // var xml = parseCode(code);
+        // last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
         workspace.clear()
         Blockly.Xml.appendDomToWorkspace(xml, workspace)
-    } catch (error) {
-        console.log(error)
-        if (!(error == "TypeError: Next block does not have previous statement." || error == "TypeError: Next statement does not exist.")) {
-            $("#error_text").val(error)
-            $("#error_dialog_background").css("display", "block");
-        } else {
-            $("#error_text").val("無効な命令があります")
-            $("#error_dialog_background").css("display", "block");
-            workspace.clear()
-            Blockly.Xml.appendDomToWorkspace(last_workspace_xml, workspace)
-        }
-    }
+        workspace.cleanUp()
+    // } catch (error) {
+    //     console.log(error)
+    //     if (!(error == "TypeError: Next block does not have previous statement." || error == "TypeError: Next statement does not exist.")) {
+    //         $("#error_text").val(error)
+    //         $("#error_dialog_background").css("display", "block");
+    //     } else {
+    //         $("#error_text").val("無効な命令があります")
+    //         $("#error_dialog_background").css("display", "block");
+    //         workspace.clear()
+    //         Blockly.Xml.appendDomToWorkspace(last_workspace_xml, workspace)
+    //     }
+    // }
 });
 
 //--------------------------------------------------------------execution process---------------------------------------------------------------
