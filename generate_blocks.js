@@ -609,19 +609,14 @@ function generate_block_json(ast_json, isstatement=false) {
                 } else if (ast_json.operator == "-") {
                     type = "int"
                     ast_json.argument.value = ast_json.argument.value*-1;
+
                     json_block = {
-                        "_attributes": {"type": "math_arithmetic"},
-                        "field": {"_attributes": {"name": "OP"},"_text":"MULTIPLY"},
-                        "value": [
-                            {
-                                "_attributes": {"name": "A"},
-                                "block":generate_block_json(ast_json.argument)["block"]
-                            },
-                            {
-                                "_attributes": {"name": "B"},
-                                "block":{"_attributes": {"type": "math_number"},"field":{"_attributes": {"name": "NUM"}, "_text":-1}}
-                            }
-                        ]
+                        "_attributes": {"type": "math_single"},
+                        "field": {"_attributes": {"name": "OP"},"_text":"NEG"},
+                        "value": {
+                            "_attributes": {"name": "NUM"},
+                            "block":generate_block_json(ast_json.argument)["block"]
+                        }
                     }
 
                 } else {
@@ -702,18 +697,12 @@ function generate_block_json(ast_json, isstatement=false) {
                         "inputs": {
                             "_attributes": {"name": "DELTA"},
                             "block": {
-                                "_attributes": {"type": "math_arithmetic"},
-                                "field": {"_attributes": {"name": "OP"},"_text":"MULTIPLY"},
-                                "value": [
-                                    {
-                                        "_attributes": {"name": "A"},
-                                        "block":generate_block_json(ast_json.right)["block"]
-                                    },
-                                    {
-                                        "_attributes": {"name": "B"},
-                                        "block":{"_attributes": {"type": "math_number"},"field":{"_attributes": {"name": "NUM"}, "_text":-1}}
-                                    }
-                                ]
+                                "_attributes": {"type": "math_single"},
+                                "field": {"_attributes": {"name": "OP"},"_text":"NEG"},
+                                "value": {
+                                    "_attributes": {"name": "NUM"},
+                                    "block":generate_block_json(ast_json.right)["block"]
+                                }
                             }
 
                         }
