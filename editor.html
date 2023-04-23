@@ -27,6 +27,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/acorn/5.5.3/acorn.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/acorn/5.5.3/acorn_loose.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/acorn/5.5.3/walk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
   <!-- <script src="codemirror.js"></script>
   <script src="javascript.js"></script>
   <script src="acorn.js"></script>
@@ -43,12 +44,12 @@
   <!-- <link rel="stylesheet" href="codemirror.css">
   <link rel="stylesheet" href="darcula.min.css">
   <link rel="stylesheet" href="css2.css" /> -->
-  <title>Editor</title>
+  <title>Katatsumuri</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style-editor.css">
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+
 </head>
 <body>
   <header>
@@ -105,21 +106,6 @@
         share
         </span>
     </div>
-    <div id="account">
-      <span class="material-symbols-outlined" id="account_icon">
-        person
-      </span>
-      <ul class="dropdown_lists" id="account_dropdown">
-        <div id="loggingout">
-        <li class="dropdown_list"><p id="new_account">登録</p></li>
-        <li class="dropdown_list"><p id="login">ログイン</p></li>
-        </div>
-        <div id="loggingin">
-        <li class="dropdown_list"><p id="show_uid">ユーザーIDを取得</p></li>
-        <li class="dropdown_list"><p id="logout">ログアウト</p></li>
-        </div>
-      </ul>
-    </div>
   </header>
   <div id="blocklyArea">
     <div id="blocklyDiv" style="position: absolute"></div>
@@ -164,6 +150,7 @@
       </block>
     </category>
     <category name="ループ" colour="%{BKY_LOOPS_HUE}" css-icon="customIcon">
+      <block type="start_block"></block>
       <block type="simple_for">
         <value name="NUM">
           <shadow type="math_number">
@@ -305,6 +292,7 @@
           </shadow>
         </value>
       </block>
+      <block type="text"></block>
       <block type="question_block">
         <value name="TEXT">
           <shadow type="text">
@@ -315,7 +303,6 @@
       <block type="variables_get">
         <field name="VAR">answer</field>
       </block>
-      <block type="text"></block>
       <block type="text_join">
         <value name="ADD0">
           <shadow type="text">
@@ -447,7 +434,6 @@
           </shadow>
         </value>
       </block>
-
     </category>
     <category name="配列" colour="%{BKY_LISTS_HUE}" css-icon="customIcon">
       <block type="lists_create_empty"></block>
@@ -606,30 +592,17 @@
         <p>リンクを知っている全員がアクセスできる状態になります</p>
       </div>
       <div class="share_info">
-        <div class="selectBox share_range">
-          <div class="selectBox__output material-symbols-outlined share_range_output"></div>
+        <!-- <div class="selectBox">
+          <div class="selectBox__output material-symbols-outlined"></div>
           <div class="selectBox__selector">
-            <div class="selectBox__selectorItem shareRange_selectorItem" data-select="everyone">リンクを知っている全員</div>
-            <div class="selectBox__selectorItem shareRange_selectorItem" data-select="limit">制限付き</div>
+            <div class="selectBox__selectorItem" data-select="editor">編集者</div>
+            <div class="selectBox__selectorItem" data-select="reader">閲覧者</div>
           </div>
-        </div>
-        <div class="selectBox authority">
-          <div class="selectBox__output material-symbols-outlined authority_output"></div>
-          <div class="selectBox__selector">
-            <div class="selectBox__selectorItem authority_selectorItem" data-select="editor">編集者</div>
-            <div class="selectBox__selectorItem authority_selectorItem" data-select="reader">閲覧者</div>
-          </div>
-        </div>
-        <div class="share_user">
-          <p class="add_user">
-            <input type="text" placeholder="ユーザーID" id="add_user_id">
-            <button id="add_user_btn">追加</button>
-          </p>
-          <p class="user_list_label">アクセスできるユーザー</p>
-          <div class="share_user_list">
-
-          </div>
-        </div>
+          <select name="role">
+            <option value="editor">編集者</option>
+            <option value="reader">閲覧者</option>
+          </select>
+        </div> -->
         <div class="link">
           <p class="link_field">https://xxxx</p>
           <button id="link_copy">
@@ -641,22 +614,6 @@
       </div>
       <div class="buttons">
         <button id="ok">OK</button>
-      </div>
-    </div>
-  </div>
-  <div id="uid_dialog_background">
-    <div id="uid_dialog">
-      <h2>ユーザーID</h2>
-      <div class="uid">
-        <p class="uid_field">xxxx</p>
-        <button id="uid_copy">
-          <span class="material-symbols-outlined">
-            content_copy
-          </span>
-        </button>
-      </div>
-      <div class="buttons">
-        <button id="uid_ok">OK</button>
       </div>
     </div>
   </div>
