@@ -1,4 +1,6 @@
 var function_list = []
+var function_results = []
+var predefined_function = []
 var code_raw = "";
 function exception_block(ast_json) {
     console.log(ast_json.start)
@@ -12,6 +14,38 @@ function exception_block(ast_json) {
     console.log(resultJson)
     json_block = resultJson["xml"]["block"]
     return json_block;
+}
+
+function generate_json_block_function(ast_json, type) {
+    try {
+        var mutation = []
+        for (var i = 0; i < ast_json.params.length; i++) {
+            mutation.push({
+                "arg": {
+                    "_attributes": {"name": ast_json.params[i].name},
+                }
+            })
+        }
+        json_block = {
+            "_attributes": {"type": type},
+            "mutation": mutation,
+            "field": {
+                "_attributes": {"name": "NAME"},
+                "_text": ast_json.id.name
+            },
+            "statement": {
+                "_attributes": {"name": "STACK"},
+                "block":generate_block_json(ast_json.body, true)["block"]["block"]
+            }
+
+        }
+        function_list.push(ast_json)
+        isreturn = true;
+    } catch (e) {
+        json_block = exception_block(ast_json)
+        isreturn = false;
+    }
+    return json_block
 }
 
 function generate_block_json(ast_json, isstatement=false) {
@@ -53,13 +87,13 @@ function generate_block_json(ast_json, isstatement=false) {
                             "_attributes": {
                                 "name":"A",
                             },
-                            "block":a_input,
+                            "block": ast_json.left ? a_input : [],
                         },
                         {
                             "_attributes": {
                                 "name":"B",
                             },
-                            "block":b_input,
+                            "block": ast_json.right ? b_input : [],
                         }
                     ]
                 }
@@ -130,13 +164,13 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "_attributes": {
                                     "name":"DIVIDEND"
                                 },
-                                "block":a_input,
+                                "block": ast_json.left ? a_input : [],
                             },
                             {
                                 "_attributes": {
                                     "name":"DIVISOR"
                                 },
-                                "block":b_input,
+                                "block": ast_json.right ? b_input : [],
                             }
 
                         ]
@@ -158,13 +192,13 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "_attributes": {
                                         "name": "ADD0",
                                     },
-                                    "block": a_input
+                                    "block": ast_json.left ? a_input : []
                                 },
                                 {
                                     "_attributes": {
                                         "name": "ADD1",
                                     },
-                                    "block": b_input
+                                    "block": ast_json.right ? b_input : []
                                 }
                             ]
                         }
@@ -185,13 +219,13 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "_attributes": {
                                         "name": "A",
                                     },
-                                    "block": a_input
+                                    "block": ast_json.left ? a_input : []
                                 },
                                 {
                                     "_attributes": {
                                         "name": "B",
                                     },
-                                    "block": b_input
+                                    "block": ast_json.right ? b_input : []
                                 }
                             ]
                         }
@@ -202,6 +236,7 @@ function generate_block_json(ast_json, isstatement=false) {
                 break;
             case "CallExpression":
                     if (ast_json.callee.name == "output") {
+                        console.log(ast_json.arguments[0])
                         try {
                             json_block = {
                                 "_attributes": {
@@ -211,15 +246,75 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "_attributes": {
                                         "name": "output",
                                     },
-                                    "block":generate_block_json(ast_json.arguments[0])["block"],
+                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : [],
 
                                 }
                             }
                         } catch (e) {
+                            console.log(e)
                             json_block = exception_block(ast_json)
                             isreturn = false;
                         }
                         isreturn = false;
+                    } else if (ast_json.callee.name == "textCount") {
+                        json_block = {
+                            "_attributes": {
+                                "type": "text_count_custom",
+                            },
+                            "value": [
+                                {
+                                    "_attributes": {"name": "TEXT"},
+                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : [],
+
+                                },
+                                {
+                                    "_attributes": {"name": "SUB"},
+                                    "block": ast_json.arguments[1] ? generate_block_json(ast_json.arguments[1])["block"] : [],
+
+                                }
+                            ]
+                        }
+                    } else if (ast_json.callee.name == "textReplace") {
+                        json_block = {
+                            "_attributes": {
+                                "type": "text_replace_custom",
+                            },
+                            "value": [
+                                {
+                                    "_attributes": {"name": "TEXT"},
+                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : [],
+
+                                },
+                                {
+                                    "_attributes": {"name": "FROM"},
+                                    "block": ast_json.arguments[1] ? generate_block_json(ast_json.arguments[1])["block"] : [],
+
+                                },
+                                {
+                                    "_attributes": {"name": "TO"},
+                                    "block": ast_json.arguments[2] ? generate_block_json(ast_json.arguments[2])["block"] : [],
+
+                                }
+                            ]
+                        }
+                    } else if (ast_json.callee.name == "listsRepeat") {
+                        json_block = {
+                            "_attributes": {
+                                "type": "lists_repeat_custom",
+                            },
+                            "value": [
+                                {
+                                    "_attributes": {"name": "ITEM"},
+                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : [],
+
+                                },
+                                {
+                                    "_attributes": {"name": "NUM"},
+                                    "block": ast_json.arguments[1] ? generate_block_json(ast_json.arguments[1])["block"] : [],
+
+                                }
+                            ]
+                        }
                     } else if (typeof ast_json.callee.property != "undefined"){
                         if (ast_json.callee.property.name === "prompt" && ast_json.callee.object.name == "window"){
                             json_block = {
@@ -235,7 +330,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 },
                                 "value": {
                                     "_attributes": {"name": "TEXT"},
-                                    "block":generate_block_json(ast_json.arguments[0])["block"]
+                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
                                 }
                             }
                         } else if (ast_json.callee.property.name == "indexOf" || ast_json.callee.property.name == "lastIndexOf") {
@@ -265,11 +360,11 @@ function generate_block_json(ast_json, isstatement=false) {
                                             "value": [
                                                 {
                                                     "_attributes": {"name": "VALUE"},
-                                                    "block":generate_block_json(ast_json.callee.object)["block"]
+                                                    "block": ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []
                                                 },
                                                 {
                                                     "_attributes": {"name": "FIND"},
-                                                    "block":generate_block_json(ast_json.arguments[0])["block"]
+                                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
                                                 }
                                             ]
                                         }
@@ -291,7 +386,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "value": [
                                     {
                                         "_attributes": {"name": "VALUE"},
-                                        "block":generate_block_json(ast_json.callee.object)["block"]
+                                        "block": ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []
                                     },
                                     {
                                         "_attributes": {"name": "AT"},
@@ -301,7 +396,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                             "value":[
                                                 {
                                                     "_attributes": {"name": "A"},
-                                                    "block":generate_block_json(ast_json.arguments[0])["block"]
+                                                    "block": ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
 
                                                 },
                                                 {
@@ -320,7 +415,7 @@ function generate_block_json(ast_json, isstatement=false) {
                             if (ast_json.arguments.length == 1) {
                                 at2_block = {"_attributes": {"type": "math_number"},"field":{"_attributes": {"name": "NUM"}, "_text":1}}
                             } else {
-                                at2_block = generate_block_json(ast_json.arguments[1])["block"]
+                                at2_block = ast_json.arguments[1] ? generate_block_json(ast_json.arguments[1])["block"] : []
                             }
                             json_block = {
                                 "_attributes": {"type": "text_getSubstring"},
@@ -329,7 +424,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "value": [
                                     {
                                         "_attributes": {"name": "STRING"},
-                                        "block": generate_block_json(ast_json.callee.object)["block"],
+                                        "block": ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : [],
                                     },
                                     {
                                         "_attributes": {"name": "AT1"},
@@ -339,7 +434,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                             "value": [
                                                 {
                                                     "_attributes": {"name": "A"},
-                                                    "block":generate_block_json(ast_json.arguments[0])["block"]
+                                                    "block":ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
                                                 },
                                                 {
                                                     "_attributes": {"name": "B"},
@@ -362,7 +457,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "field": {"_attributes": {"name": "CASE"},"_text": 'UPPERCASE'},
                                 "value": {
                                     "_attributes": {"name": "TEXT"},
-                                    "block":generate_block_json(ast_json.callee.object)["block"]
+                                    "block": ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []
                                 }
                             }
                         } else if (ast_json.callee.property.name == "toLowerCase") {
@@ -372,7 +467,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "field": {"_attributes": {"name": "CASE"},"_text": 'LOWERCASE'},
                                 "value": {
                                     "_attributes": {"name": "TEXT"},
-                                    "block":generate_block_json(ast_json.callee.object)["block"]
+                                    "block": ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []
                                 }
                             }
                         } else if (ast_json.callee.property.name == "split") {
@@ -381,8 +476,8 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "mutation": {"_attributes": {"mode": "SPLIT"},},
                                 "field": {"_attributes": {"name": "MODE"},"_text":"SPLIT"},
                                 "value": [
-                                    {"_attributes": {"name": "INPUT"},"block":generate_block_json(ast_json.callee.object)["block"]},
-                                    {"_attributes": {"name": "DELIM"},"block":generate_block_json(ast_json.arguments[0])["block"]}
+                                    {"_attributes": {"name": "INPUT"},"block":ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []},
+                                    {"_attributes": {"name": "DELIM"},"block":ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []}
                                 ]
                             }
                         } else if (ast_json.callee.property.name == "join") {
@@ -392,14 +487,19 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "mutation": {"_attributes": {"mode": "JOIN"},},
                                 "field": {"_attributes": {"name": "MODE"},"_text":"JOIN"},
                                 "value": [
-                                    {"_attributes": {"name": "INPUT"},"block":generate_block_json(ast_json.callee.object)["block"]},
-                                    {"_attributes": {"name": "DELIM"},"block":generate_block_json(ast_json.arguments[0])["block"]}
+                                    {"_attributes": {"name": "INPUT"},"block":ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []},
+                                    {"_attributes": {"name": "DELIM"},"block":ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []}
                                 ]
                             }
                         } else if (ast_json.callee.property.name == "reverse") {
                             json_block = {
-                                "_attributes": {"type": "lists_reverse"},
-                                "value": {"_attributes": {"name": "LIST"},"block":generate_block_json(ast_json.callee.object)["block"]}
+                                "_attributes": {"type": "lists_reverse_custom"},
+                                "value": {"_attributes": {"name": "LIST"},"block":ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []}
+                            }
+                        } else if (ast_json.callee.property.name == "sort") {
+                            json_block = {
+                                "_attributes": {"type": "lists_sort_custom"},
+                                "value": {"_attributes": {"name": "LIST"},"block":ast_json.callee.object ? generate_block_json(ast_json.callee.object)["block"] : []}
                             }
                         } else if (ast_json.callee.object.name == "Math") {
                             type = "int";
@@ -410,11 +510,11 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "value":[
                                         {
                                             "_attributes": {"name": "A"},
-                                            "block":generate_block_json(ast_json.arguments[0])["block"]
+                                            "block":ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
                                         },
                                         {
                                             "_attributes": {"name": "B"},
-                                            "block":generate_block_json(ast_json.arguments[1])["block"]
+                                            "block":ast_json.arguments[1] ? generate_block_json(ast_json.arguments[1])["block"] : []
                                         }
                                     ]
                                 }
@@ -441,7 +541,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "field": {"_attributes": {"name": "OP"},"_text":op},
                                     "value": {
                                         "_attributes": {"name": "NUM"},
-                                        "block":generate_block_json(ast_json.arguments[0])["block"]
+                                        "block":ast_json.arguments[0] ? generate_block_json(ast_json.arguments[0])["block"] : []
                                     }
                                 }
                             }
@@ -449,12 +549,14 @@ function generate_block_json(ast_json, isstatement=false) {
                             throw new Error("exceptional block")
                         }
                     } else {
+                        var function_json = {};
                         var issetfunction = false;
                         var params = []
                         var arg = []
                         for (var i = 0; i < function_list.length; i++) {
                             if (function_list[i].id.name == ast_json.callee.name) {
                                 issetfunction = true
+                                function_json = function_list[i]
                                 for (var j = 0; j < function_list[i].params.length; j++) {
                                     params.push({
                                         "_attributes": {"name": function_list[i].params[j].name}
@@ -462,15 +564,21 @@ function generate_block_json(ast_json, isstatement=false) {
                                 }
                             }
                         }
+
                         if (issetfunction) {
 
-
+                                console.log(isstatement)
                                 if (isstatement) {
+                                    if (!predefined_function.includes(function_json.id.name)){
+                                        function_results.push(generate_json_block_function(function_json, "procedures_defnoreturn"))
+                                        predefined_function.push(function_json.id.name)
+                                    }
                                     try {
+
                                         for (var i = 0; i < ast_json.arguments.length; i++) {
                                             arg.push({
                                                 "_attributes": {"name": "ARG"+i},
-                                                "block": generate_block_json(ast_json.arguments[i])["block"]
+                                                "block": ast_json.arguments[i] ? generate_block_json(ast_json.arguments[i])["block"] : []
                                             })
                                         }
                                         json_block = {
@@ -486,10 +594,14 @@ function generate_block_json(ast_json, isstatement=false) {
                                         isreturn = false;
                                     }
                                 } else {
+                                    if (!predefined_function.includes(function_json.id.name)){
+                                        function_results.push(generate_json_block_function(function_json, "procedures_defreturn"))
+                                        predefined_function.push(function_json.id.name)
+                                    }
                                     for (var i = 0; i < ast_json.arguments.length; i++) {
                                         arg.push({
                                             "_attributes": {"name": "ARG"+i},
-                                            "block": generate_block_json(ast_json.arguments[i])["block"]
+                                            "block": ast_json.arguments[i] ? generate_block_json(ast_json.arguments[i])["block"] : []
                                         })
                                     }
                                     json_block = {
@@ -528,7 +640,7 @@ function generate_block_json(ast_json, isstatement=false) {
                             "_attributes": {"type": "text_length"},
                             "value": {
                                 "_attributes": {"name": "VALUE"},
-                                "block":generate_block_json(ast_json.object)["block"]
+                                "block":ast_json.object ? generate_block_json(ast_json.object)["block"] : []
                             }
                         }
                     } else {
@@ -536,7 +648,7 @@ function generate_block_json(ast_json, isstatement=false) {
                             "_attributes": {"type": "lists_length"},
                             "value": {
                                 "_attributes": {"name": "VALUE"},
-                                "block":generate_block_json(ast_json.object)["block"]
+                                "block":ast_json.object ? generate_block_json(ast_json.object)["block"] : []
                             }
                         }
                     }
@@ -552,7 +664,7 @@ function generate_block_json(ast_json, isstatement=false) {
                         "value": [
                             {
                                 "_attributes": {"name": "VALUE"},
-                                "block": generate_block_json(ast_json.object)["block"]
+                                "block": ast_json.object ?  generate_block_json(ast_json.object)["block"] : []
                             },
                             {
                                 "_attributes": {"name": "AT"},
@@ -562,7 +674,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                     "value":[
                                         {
                                             "_attributes": {"name": "A"},
-                                            "block":generate_block_json(ast_json.property)["block"]
+                                            "block": ast_json.property ? generate_block_json(ast_json.property)["block"] : []
                                         },
                                         {
                                             "_attributes": {"name": "B"},
@@ -589,15 +701,15 @@ function generate_block_json(ast_json, isstatement=false) {
                         }
                     }
                 } else {
-                    type = generate_block_json(ast_json.expression)["type"]
-                    json_block = generate_block_json(ast_json.expression)["block"];
-                    isreturn = generate_block_json(ast_json.expression)["return"];
+                    type = generate_block_json(ast_json.expression, true)["type"]
+                    json_block = generate_block_json(ast_json.expression, true)["block"];
+                    isreturn = generate_block_json(ast_json.expression, true)["return"];
                 }
                 break;
             case "UnaryExpression":
                 if (ast_json.operator == "!") {
                     type = "bool"
-                    var bool = generate_block_json(ast_json.argument)["block"];
+                    var bool = ast_json.argument ? generate_block_json(ast_json.argument)["block"] : [];
                     console.log(bool)
                     json_block = {
                         "_attributes": {"type": "logic_negate"},
@@ -615,7 +727,7 @@ function generate_block_json(ast_json, isstatement=false) {
                         "field": {"_attributes": {"name": "OP"},"_text":"NEG"},
                         "value": {
                             "_attributes": {"name": "NUM"},
-                            "block":generate_block_json(ast_json.argument)["block"]
+                            "block":ast_json.argument ? generate_block_json(ast_json.argument)["block"] : []
                         }
                     }
 
@@ -634,7 +746,7 @@ function generate_block_json(ast_json, isstatement=false) {
                             },
                             "value": {
                                 "_attributes": {"name": "VALUE"},
-                                "block": generate_block_json(ast_json.right)["block"]
+                                "block": ast_json.right ? generate_block_json(ast_json.right)["block"] : []
                             }
                         }
                         isreturn = false;
@@ -651,7 +763,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "value": [
                                     {
                                         "_attributes": {"name": "LIST"},
-                                        "block": generate_block_json(ast_json.left.object)["block"]
+                                        "block": ast_json.left.object ? generate_block_json(ast_json.left.object)["block"] : []
                                     },
                                     {
                                         "_attributes": {"name": "AT"},
@@ -659,14 +771,14 @@ function generate_block_json(ast_json, isstatement=false) {
                                             "_attributes": {"type": "math_arithmetic"},
                                             "field": {"_attributes": {"name": "OP"},"_text":"ADD"},
                                             "value": [
-                                                {"_attributes": {"name": "A"},"block":generate_block_json(ast_json.left.property)["block"]},
+                                                {"_attributes": {"name": "A"},"block":ast_json.left.property ? generate_block_json(ast_json.left.property)["block"] : []},
                                                 {"_attributes": {"name": "B"},"block":{"_attributes": {"type": "math_number"},"field":{"_attributes": {"name": "NUM"}, "_text":1}}}
                                             ]
                                         }
                                     },
                                     {
                                         "_attributes": {"name": "TO"},
-                                        "block": generate_block_json(ast_json.right)["block"]
+                                        "block": ast_json.right ? generate_block_json(ast_json.right)["block"] : []
                                     }
                                 ]
                             }
@@ -682,7 +794,7 @@ function generate_block_json(ast_json, isstatement=false) {
                         },
                         "value": {
                             "_attributes": {"name": "DELTA"},
-                            "block": generate_block_json(ast_json.right)["block"]
+                            "block": ast_json.right ? generate_block_json(ast_json.right)["block"] : []
                         }
                     }
                     isreturn = false;
@@ -701,7 +813,7 @@ function generate_block_json(ast_json, isstatement=false) {
                                 "field": {"_attributes": {"name": "OP"},"_text":"NEG"},
                                 "value": {
                                     "_attributes": {"name": "NUM"},
-                                    "block":generate_block_json(ast_json.right)["block"]
+                                    "block": ast_json.right ? generate_block_json(ast_json.right)["block"] : []
                                 }
                             }
 
@@ -769,7 +881,7 @@ function generate_block_json(ast_json, isstatement=false) {
                 json_block = {};
                 for (var i = 0; i < ast_json.body.length; i++) {
                     if (i > 0) {
-                        block_and_next = generate_block_json(ast_json.body[ast_json.body.length - 1 - i], true)["block"]
+                        block_and_next = ast_json.body[ast_json.body.length - 1 - i] ? generate_block_json(ast_json.body[ast_json.body.length - 1 - i], true)["block"] : {}
                         block_and_next["next"] = json_block
                         json_block = {
                             "block":block_and_next,
@@ -778,7 +890,7 @@ function generate_block_json(ast_json, isstatement=false) {
                     } else {
 
                         json_block = {
-                            "block":generate_block_json(ast_json.body[ast_json.body.length - 1 - i], true)["block"]
+                            "block": ast_json.body[ast_json.body.length - 1 - i] ? generate_block_json(ast_json.body[ast_json.body.length - 1 - i], true)["block"] : []
                         }
                         console.log(json_block)
                     }
@@ -789,8 +901,8 @@ function generate_block_json(ast_json, isstatement=false) {
 
             case "WhileStatement":
                 try {
-                    var bool = generate_block_json(ast_json.test)["block"];
-                    var do_block = generate_block_json(ast_json.body, true)["block"];
+                    var bool = ast_json.test ? generate_block_json(ast_json.test)["block"] : [];
+                    var do_block = ast_json.body ? generate_block_json(ast_json.body, true)["block"] : [];
                     json_block = {
                         "_attributes": {"type": "controls_whileUntil"},
                         "field": {
@@ -823,7 +935,7 @@ function generate_block_json(ast_json, isstatement=false) {
                             "value": [
                                 {
                                     "_attributes": {"name": "A"},
-                                    "block": generate_block_json(ast_json.test.right)["block"]
+                                    "block": ast_json.test.right ? generate_block_json(ast_json.test.right)["block"] : []
                                 },
                                 {
                                     "_attributes": {"name": "B"},
@@ -832,13 +944,13 @@ function generate_block_json(ast_json, isstatement=false) {
                             ]
                         }
                     } else if (ast_json.test.operator == "<=") {
-                        var to_block = generate_block_json(ast_json.test.right)["block"];
+                        var to_block = ast_json.test.right ? generate_block_json(ast_json.test.right)["block"] : [];
                     } else {
                         throw new Error("exceptional block");
                     }
-                    var from_block = generate_block_json(ast_json.init.right)["block"];
-                    var by_block = generate_block_json(ast_json.update)["block"];
-                    var do_block = generate_block_json(ast_json.body, true)["block"];
+                    var from_block = ast_json.init.right ? generate_block_json(ast_json.init.right)["block"] : [];
+                    var by_block = ast_json.update ? generate_block_json(ast_json.update)["block"] : [];
+                    var do_block = ast_json.body ? generate_block_json(ast_json.body, true)["block"] : [];
                     json_block = {
                         "_attributes": {"type": "controls_for"},
                         "field": {
@@ -883,7 +995,7 @@ function generate_block_json(ast_json, isstatement=false) {
                         if (typeof current.test != "undefined" && typeof current.consequent != "undefined") {
                             value.push({
                                 "_attributes": {"name": "IF"+if_count},
-                                "block":generate_block_json(current.test)["block"],
+                                "block": current.test ? generate_block_json(current.test)["block"] : [],
                             })
                             do_if = {
                                 "_attributes": {"name": "DO"+if_count},
@@ -915,33 +1027,8 @@ function generate_block_json(ast_json, isstatement=false) {
                 isreturn = false;
                 break;
             case "FunctionDeclaration":
-                try {
-                    var mutation = []
-                    for (var i = 0; i < ast_json.params.length; i++) {
-                        mutation.push({
-                            "arg": {
-                                "_attributes": {"name": ast_json.params[i].name},
-                            }
-                        })
-                    }
-                    json_block = {
-                        "_attributes": {"type": "procedures_defnoreturn"},
-                        "mutation": mutation,
-                        "field": {
-                            "_attributes": {"name": "NAME"},
-                            "_text": ast_json.id.name
-                        },
-                        "statement": {
-                            "_attributes": {"name": "STACK"},
-                            "block":generate_block_json(ast_json.body, true)["block"]["block"]
-                        }
 
-                    }
-                    function_list.push(ast_json)
-                } catch (e) {
-                    json_block = exception_block(ast_json)
-                    isreturn = false;
-                }
+                function_list.push(ast_json)
                 break;
 
             case "Identifier":
@@ -990,6 +1077,8 @@ function generateBlock(code) {
     console.log(Blockly.serialization.workspaces.save(workspace))
     console.log(Blockly.Xml.workspaceToDom(workspace));
     console.log(ast_json)
+    function_results = []
+    predefined_function = []
     var blocks = []
     for (var i = 0; i < ast_json.length; i++) {
         var block = generate_block_json(ast_json[i], true)
@@ -1005,7 +1094,8 @@ function generateBlock(code) {
     console.log(blocks)
     json_block = {};
     result_json = {}
-    function_results = []
+
+
     for (var i = 0; i < blocks.length; i++) {
         console.log(blocks[blocks.length -1 - i])
         // for (var j = 0; j < Object.keys(blocks[blocks.length -1 - i]).length; j++){
@@ -1013,6 +1103,7 @@ function generateBlock(code) {
         // }
         // console.log(json_block)
         if (Object.keys(blocks[blocks.length -1 - i]["block"]).length > 0) {
+            console.log(blocks[blocks.length -1 - i]["return"])
             if (blocks[blocks.length -1 - i]["return"] != true ) {
                 console.log(result_json)
                 if (Object.keys(result_json).length > 0) {
@@ -1045,7 +1136,14 @@ function generateBlock(code) {
             }
         ]
     } else {
-        result_json = []
+        result_json = [
+            {
+                "_attributes": {"type": "start_block"},
+                "statement": {
+                    "_attributes": {"name": "DO"},
+                }
+            }
+        ]
     }
     for (var i = 0; i < function_results.length; i++){
         result_json.push(function_results[i])
@@ -1055,20 +1153,23 @@ function generateBlock(code) {
     console.log(result_json)
 
 
-    result_json = {
-        "xml":{
-            "block":result_json
-        }
-    }
-    console.log(result_json)
-    var jsonData = JSON.stringify(result_json);
-    var resultXml = json2xml(jsonData, { compact: true, spaces: 2 });
-    console.log(resultXml);
-    // var xmlDom = Blocklify.JavaScript.importer.codeToDom(code, 'atomic');
-    // console.log(xmlDom)
-    // Blockly.Xml.domToWorkspace(xmlDom, workspace);
-    const parser = new DOMParser();
-    const dom = parser.parseFromString(resultXml, "application/xml").documentElement;
-    console.log(dom);
-    return dom
+    // result_json = {
+    //         "block":result_json
+    // }
+    var dom_list = []
+    result_json.forEach(element => {
+        console.log(element)
+        var jsonData = JSON.stringify({"block":element});
+        var resultXml = json2xml(jsonData, { compact: true, spaces: 2 });
+        console.log(resultXml);
+        // var xmlDom = Blocklify.JavaScript.importer.codeToDom(code, 'atomic');
+        // console.log(xmlDom)
+        // Blockly.Xml.domToWorkspace(xmlDom, workspace);
+        var parser = new DOMParser();
+        var dom = parser.parseFromString(resultXml, "application/xml").documentElement;
+        console.log(dom);
+        dom_list.push(dom)
+    });
+
+    return dom_list
 }
