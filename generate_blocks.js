@@ -551,10 +551,11 @@ function generate_block_json(ast_json, isstatement=false) {
                     } else {
                         var function_json = {};
                         var issetfunction = false;
-                        var params = []
-                        var arg = []
+
+
                         for (var i = 0; i < function_list.length; i++) {
                             if (function_list[i].id.name == ast_json.callee.name) {
+                                var params = []
                                 issetfunction = true
                                 function_json = function_list[i]
                                 for (var j = 0; j < function_list[i].params.length; j++) {
@@ -564,6 +565,8 @@ function generate_block_json(ast_json, isstatement=false) {
                                 }
                             }
                         }
+                        console.log(function_json)
+                        console.log(params)
 
                         if (issetfunction) {
 
@@ -574,13 +577,14 @@ function generate_block_json(ast_json, isstatement=false) {
                                         predefined_function.push(function_json.id.name)
                                     }
                                     try {
-
+                                        var arg = []
                                         for (var i = 0; i < ast_json.arguments.length; i++) {
                                             arg.push({
                                                 "_attributes": {"name": "ARG"+i},
                                                 "block": ast_json.arguments[i] ? generate_block_json(ast_json.arguments[i])["block"] : []
                                             })
                                         }
+                                        console.log(arg)
                                         json_block = {
                                             "_attributes": {"type": "procedures_callnoreturn"},
                                             "mutation": {
@@ -848,21 +852,25 @@ function generate_block_json(ast_json, isstatement=false) {
                 var type;
                 var fields_type;
                 var value;
+                var r_type;
                 switch (typeof ast_json.value) {
                     case "number":
                         type = "math_number";
                         fields_type = "NUM";
                         value = ast_json.value;
+                        r_type = "int"
                         break;
                     case "string":
                         type = "text";
                         fields_type = "TEXT";
                         value = ast_json.value;
+                        r_type = "string"
                         break;
                     case "boolean":
                         type = "logic_boolean";
                         fields_type = "BOOL";
                         value = String(ast_json.value).toUpperCase();
+                        r_type = "bool"
                         break;
                     default:
                         throw new Error("exceptional block");
@@ -876,6 +884,7 @@ function generate_block_json(ast_json, isstatement=false) {
                         "_text": value
                     }
                 }
+                type = r_type
                 break;
             case "BlockStatement":
                 json_block = {};
