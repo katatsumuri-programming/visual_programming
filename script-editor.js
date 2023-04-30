@@ -59,6 +59,8 @@ function new_file() {
                 doc.setValue("");
                 workspace.clear();
                 project_name = filename;
+                var dom = (new DOMParser()).parseFromString("<xml><block type='startblock'></block></xml>", "application/xml").documentElement;
+                Blockly.Xml.appendDomToWorkspace(dom, workspace)
                 var xml = Blockly.Xml.workspaceToDom(workspace);
                 var myBlockXml = Blockly.Xml.domToText(xml);
                 var data = {
@@ -99,6 +101,8 @@ function new_file() {
             doc.setValue("");
             workspace.clear();
             project_name = filename;
+            var dom = (new DOMParser()).parseFromString("<xml><block type='startblock'></block></xml>", "application/xml").documentElement;
+            Blockly.Xml.appendDomToWorkspace(dom, workspace)
             var xml = Blockly.Xml.workspaceToDom(workspace);
             var myBlockXml = Blockly.Xml.domToText(xml);
             var data = {
