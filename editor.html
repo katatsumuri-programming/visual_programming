@@ -44,7 +44,7 @@
   <!-- <link rel="stylesheet" href="codemirror.css">
   <link rel="stylesheet" href="darcula.min.css">
   <link rel="stylesheet" href="css2.css" /> -->
-  <title>Katatsumuri</title>
+  <title>Editor - katacode</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style-editor.css">
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
@@ -53,7 +53,7 @@
 </head>
 <body>
   <header>
-    <img src="icon.png">
+    <img src="katacode_title.png">
     <div class="menu">
       <ul class="menu_lists">
           <li class="menu_list">
@@ -100,6 +100,23 @@
           </li>
       </ul>
     </div>
+    <div class="action_button">
+      <div id="action_icon">
+        <span class="material-symbols-outlined undo_btn_icon">
+          undo
+        </span>
+      </div>
+      <div id="action_icon">
+        <span class="material-symbols-outlined redo_btn_icon">
+          redo
+        </span>
+      </div>
+      <div id="action_icon">
+        <span class="material-symbols-outlined save_btn_icon">
+          save
+        </span>
+      </div>
+    </div>
     <input type="text" placeholder="filename" value="Untitled" id="filename">
     <div id="share">
       <span class="material-symbols-outlined share_icon">
@@ -113,7 +130,6 @@
 
   <xml id="toolbox" style="display: none">
     <category name="論理" colour="%{BKY_LOGIC_HUE}" css-icon="customIcon">
-
       <block type="logic_boolean"></block>
       <block type="logic_compare">
         <value name="A">
@@ -384,7 +400,7 @@
           </shadow>
         </value>
       </block>
-      <block type="text_count">
+      <block type="text_count_custom">
         <value name="SUB">
           <shadow type="text">
             <field name="TEXT">abc</field>
@@ -403,7 +419,7 @@
           </shadow>
         </value>
       </block>
-      <block type="text_replace">
+      <block type="text_replace_custom">
         <value name="FROM">
           <shadow type="text">
             <field name="TEXT">abc</field>
@@ -438,7 +454,7 @@
     <category name="配列" colour="%{BKY_LISTS_HUE}" css-icon="customIcon">
       <block type="lists_create_empty"></block>
       <block type="lists_create_with"></block>
-      <block type="lists_repeat">
+      <block type="lists_repeat_custom">
         <value name="ITEM">
           <shadow type="text">
             <field name="TEXT">abc</field>
@@ -483,8 +499,8 @@
           </shadow>
         </value>
       </block>
-      <block type="lists_sort"></block>
-      <block type="lists_reverse"></block>
+      <block type="lists_sort_custom"></block>
+      <block type="lists_reverse_custom"></block>
       <block type="lists_length"></block>
       <block type="lists_isEmpty"></block>
     </category>
@@ -492,8 +508,10 @@
     <category name="変数" custom="VARIABLE" colour="0" css-icon="customIcon">
     </category>
     <category name="関数" custom="PROCEDURE" colour="290" css-icon="customIcon">
+
     </category>
     <category name="コード" colour="60" css-icon="customIcon">
+      <block type="function_custom"></block>
       <block type="bi_comment"></block>
       <block type="bi_assignment"></block>
       <block type="bi_assignment_return"></block>
