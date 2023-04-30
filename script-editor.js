@@ -103,6 +103,65 @@ function new_file() {
     }
 }
 
+function overwrite() {
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var myBlockXml = Blockly.Xml.domToText(xml);
+    // console.log(myBlockXml);
+    var code = editor.getValue();
+    var console_output = output_eval.getValue();
+
+    if (!share_id || Object.keys(localStorage).includes(project_id)) {
+        var data = {
+            "project_name": $("#filename").val(),
+            "block_xml": myBlockXml,
+            "code": code,
+            "console_output": console_output,
+            "share_id": share_id,
+            "timestamp": new Date(),
+            "settings": {
+                "auto_save": $("#auto_save").prop('checked'),
+                "auto_generate_code": $("#auto_code_create").prop('checked'),
+                "turbo_mode": $("#turbo_mode").prop('checked'),
+            }
+        };
+        var setjson = JSON.stringify(data);
+        localStorage.setItem(project_id, setjson);
+    }
+    if (share_id && edit) {
+        db.collection("users").doc(share_uid).update({
+            ["projects."+project_id]: {
+                block_xml: myBlockXml,
+                code: code,
+                console_output: console_output,
+                project_name: project_name,
+            }
+        })
+          .then(()=>{
+            console.log("更新に成功しました");
+          })
+          .catch((error)=>{
+            console.log(`更新に失敗しました (${error})`);
+          });
+    }
+    if (uid && !share_id) {
+        db.collection("users").doc(uid).update({
+            ["projects."+project_id]: {
+                block_xml: myBlockXml,
+                code: code,
+                console_output: console_output,
+                project_name: project_name,
+            }
+        })
+          .then(()=>{
+            console.log("更新に成功しました");
+          })
+          .catch((error)=>{
+            console.log(`更新に失敗しました (${error})`);
+          });
+    }
+    save = true;
+}
+
 //--------------------------------------------------------------workspace-----------------------------------------------------------------------
 
 var workspace = Blockly.inject('blocklyArea',
@@ -168,6 +227,15 @@ $("#undo").click(function () {
 $("#redo").click(function () {
     workspace.undo(true);
 });
+$(".undo_btn_icon").click(function () {
+    workspace.undo(false);
+});
+$(".redo_btn_icon").click(function () {
+    workspace.undo(true);
+});
+$(".save_btn_icon").click(function () {
+    overwrite()
+});
 
 //--------------------------------------------------------------conversion process--------------------------------------------------------------
 
@@ -180,12 +248,40 @@ $("#create_code").click(function () {
 });
 $("#create_block").click(function () {
     try {
+        last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
+        var json_block_raw = JSON.parse(xml2json((new XMLSerializer()).serializeToString(Blockly.Xml.workspaceToDom(workspace)), { compact: true }))
+        if (Array.isArray(json_block_raw["xml"]["block"])){
+            json_block_raw["xml"]["block"].forEach(function(element){
+                if (
+                    element["_attributes"]["type"] == "start_block" ||
+                    element["_attributes"]["type"] == "procedures_defnoreturn" ||
+                    element["_attributes"]["type"] == "procedures_defreturn"
+                ) {
+                    console.log(element["_attributes"]["id"])
+                    workspace.getBlockById(element["_attributes"]["id"]).dispose();
+                }
+            });
+        } else {
+            if (
+                json_block_raw["xml"]["block"]["_attributes"]["type"] == "start_block" ||
+                json_block_raw["xml"]["block"]["_attributes"]["type"] == "procedures_defnoreturn" ||
+                json_block_raw["xml"]["block"]["_attributes"]["type"] == "procedures_defreturn"
+            ) {
+                console.log(json_block_raw["xml"]["block"]["_attributes"]["id"])
+                workspace.getBlockById(json_block_raw["xml"]["block"]["_attributes"]["id"]).dispose()
+            }
+        }
+        console.log(json_block_raw["xml"]["block"])
         var code = editor.getValue();
         var xml = generateBlock(code);
         // var xml = parseCode(code);
-        last_workspace_xml = Blockly.Xml.workspaceToDom(workspace);
-        workspace.clear()
-        Blockly.Xml.appendDomToWorkspace(xml, workspace)
+
+        // workspace.clear()
+        xml.forEach(element => {
+            Blockly.Xml.domToBlock(element, workspace)
+        })
+        workspace.cleanUp()
+
     } catch (error) {
         console.log(error)
         if (!(error == "TypeError: Next block does not have previous statement." || error == "TypeError: Next statement does not exist.")) {
@@ -205,13 +301,13 @@ $("#create_block").click(function () {
 function initApi(interpreter, globalObject) {
     // Add an API function for the alert() block.
     var wrapper = function(text) {
-      return alert(arguments.length ? text : '');
+      return alert(text);
     };
     interpreter.setProperty(globalObject, 'alert',
         interpreter.createNativeFunction(wrapper));
     // Add an API function for the alert() block.
     var wrapper = function(text) {
-        return output(arguments.length ? text : '');
+        return output(text);
       };
     interpreter.setProperty(globalObject, 'output',
         interpreter.createNativeFunction(wrapper));
@@ -220,6 +316,24 @@ function initApi(interpreter, globalObject) {
       return prompt(text);
     };
     interpreter.setProperty(globalObject, 'prompt',
+        interpreter.createNativeFunction(wrapper));
+
+    var wrapper = function(haystack, needle) {
+        return textCount(haystack, needle);
+    };
+    interpreter.setProperty(globalObject, 'textCount',
+        interpreter.createNativeFunction(wrapper));
+
+    var wrapper = function(haystack, needle, replacement) {
+        return textReplace(haystack, needle, replacement);
+    };
+    interpreter.setProperty(globalObject, 'textReplace',
+        interpreter.createNativeFunction(wrapper));
+
+    var wrapper = function(value, n) {
+        return listsRepeat(value, n);
+    };
+    interpreter.setProperty(globalObject, 'listsRepeat',
         interpreter.createNativeFunction(wrapper));
 }
 function nextStep() {
@@ -295,14 +409,34 @@ $("#execution").click(function() {
         }
     }
 })
-output = function(msg){
+const output = function(msg){
     var doc = output_eval.getDoc();
     doc.setValue(output_eval.getValue() + msg + "\n");
     $(".CodeMirror-scroll").scrollTop(
         $(".CodeMirror-scroll").eq(1)[0].scrollHeight - $(".CodeMirror-scroll").eq(1).height()
     );
 }
+const textCount = function (haystack, needle) {
+    if (needle.length === 0) {
+        return haystack.length + 1;
+    } else {
+        return haystack.split(needle).length - 1;
+    }
+}
 
+const textReplace =function (haystack, needle, replacement) {
+    needle = needle.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1')
+                    .replace(/\x08/g, '\\x08');
+    return haystack.replace(new RegExp(needle, 'g'), replacement);
+}
+
+const listsRepeat = function (value, n) {
+    var array = [];
+    for (var i = 0; i < n; i++) {
+        array[i] = value;
+    }
+    return array;
+}
 //--------------------------------------------------------------editor process------------------------------------------------------------------
 
 var editor = CodeMirror.fromTextArea(document.getElementById("codebox"),
@@ -516,62 +650,7 @@ $("#save_browser").click(function(){
     }
 })
 $("#overwrite_browser").click(function(){
-    var xml = Blockly.Xml.workspaceToDom(workspace);
-    var myBlockXml = Blockly.Xml.domToText(xml);
-    // console.log(myBlockXml);
-    var code = editor.getValue();
-    var console_output = output_eval.getValue();
-
-    if (!share_id || Object.keys(localStorage).includes(project_id)) {
-        var data = {
-            "project_name": $("#filename").val(),
-            "block_xml": myBlockXml,
-            "code": code,
-            "console_output": console_output,
-            "share_id": share_id,
-            "timestamp": new Date(),
-            "settings": {
-                "auto_save": $("#auto_save").prop('checked'),
-                "auto_generate_code": $("#auto_code_create").prop('checked'),
-                "turbo_mode": $("#turbo_mode").prop('checked'),
-            }
-        };
-        var setjson = JSON.stringify(data);
-        localStorage.setItem(project_id, setjson);
-    }
-    if (share_id && edit) {
-        db.collection("users").doc(share_uid).update({
-            ["projects."+project_id]: {
-                block_xml: myBlockXml,
-                code: code,
-                console_output: console_output,
-                project_name: project_name,
-            }
-        })
-          .then(()=>{
-            console.log("更新に成功しました");
-          })
-          .catch((error)=>{
-            console.log(`更新に失敗しました (${error})`);
-          });
-    }
-    if (uid && !share_id) {
-        db.collection("users").doc(uid).update({
-            ["projects."+project_id]: {
-                block_xml: myBlockXml,
-                code: code,
-                console_output: console_output,
-                project_name: project_name,
-            }
-        })
-          .then(()=>{
-            console.log("更新に成功しました");
-          })
-          .catch((error)=>{
-            console.log(`更新に失敗しました (${error})`);
-          });
-    }
-    save = true;
+    overwrite();
 })
 $("#load_computer").click(function () {
     var value = true;

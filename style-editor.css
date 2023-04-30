@@ -103,7 +103,8 @@ header {
     display: flex;
 }
 header img {
-    height: 50px;
+    margin: 12.5px 0;
+    height: 25px;
     margin-left: 20px;
     user-select: none;
 }
@@ -143,7 +144,7 @@ header input[type="text"] {
     padding-left:0;
     width: fit-content;
     position: absolute;
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 10px 10px;
     display: none;
     background-color: var(--main-color);
     width: 250px;
@@ -156,7 +157,7 @@ header input[type="text"] {
     position: relative;
 }
 .dropdown_list:last-of-type p {
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 10px 10px;
 }
 .dropdown_list p {
     padding: 10px;
@@ -228,6 +229,23 @@ input[type="checkbox"]:checked + span::before {
     background-repeat: no-repeat;
     background-position: 0 2px;
 }
+
+.action_button {
+    display: flex;
+    height: 50px;
+    margin: 0;
+    margin-left: 10px;
+}
+#action_icon span{
+    user-select: none;
+    font-size: 25px;
+    margin: 12.5px;
+    cursor: pointer;
+}
+#action_icon span:hover {
+    color: yellow;
+}
+
 
 #open_dialog_background {
     position: absolute;
