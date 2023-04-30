@@ -316,9 +316,10 @@ $("#create_block").click(function () {
         } else {
             $("#error_text").val("無効な命令があります")
             $("#error_dialog_background").css("display", "block");
-            workspace.clear()
-            Blockly.Xml.appendDomToWorkspace(last_workspace_xml, workspace)
+
         }
+        workspace.clear()
+        Blockly.Xml.appendDomToWorkspace(last_workspace_xml, workspace)
     }
 });
 
