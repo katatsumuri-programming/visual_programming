@@ -93,3 +93,85 @@ Blockly.Blocks['start_block'] = {
  this.setHelpUrl("");
   }
 };
+Blockly.Blocks['lists_sort_custom'] = {
+  init: function() {
+    this.appendValueInput("LIST")
+        .setCheck("Array");
+    this.appendDummyInput()
+        .appendField("を並び替える");
+    this.setInputsInline(true);
+    this.setOutput(true, "Array");
+    this.setColour(260);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['lists_repeat_custom'] = {
+  init: function() {
+    this.appendValueInput("ITEM")
+        .setCheck(null)
+        .appendField("項目");
+    this.appendDummyInput()
+        .appendField("を");
+    this.appendValueInput("NUM")
+        .setCheck("Number");
+    this.appendDummyInput()
+        .appendField("回繰り返したリストを作成");
+    this.setOutput(true, "Array");
+    this.setColour(260);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['text_count_custom'] = {
+  init: function() {
+    this.appendValueInput("TEXT")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("に含まれる");
+    this.appendValueInput("SUB")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("の数を数える");
+    this.setOutput(true, "Number");
+    this.setColour(160);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['text_replace_custom'] = {
+  init: function() {
+    this.appendValueInput("TEXT")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("に含まれる");
+    this.appendValueInput("FROM")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("を");
+    this.appendValueInput("TO")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("に置換");
+    this.setOutput(true, "String");
+    this.setColour(160);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['lists_reverse_custom'] = {
+  init: function() {
+    this.appendValueInput("LIST")
+        .setCheck("Array");
+    this.appendDummyInput()
+        .appendField("を逆順に");
+    this.setOutput(true, "Array");
+    this.setColour(260);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
