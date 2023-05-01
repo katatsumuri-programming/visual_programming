@@ -11,7 +11,8 @@ header {
     display: flex;
 }
 header img {
-    height: 50px;
+    margin: 12.5px 0;
+    height: 25px;
     margin-left: 20px;
     user-select: none;
 }
