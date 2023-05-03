@@ -157,38 +157,7 @@ function overwrite() {
     };
     var setjson = JSON.stringify(data);
     localStorage.setItem($("#filename").val(), setjson);
-    if (project_id) {
-        fetch('mysql.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                process:'set',
-                id: project_id,
-                block_xml: myBlockXml,
-                code: code,
-                console_output: console_output,
-                project_name: project_name,
-                edit: edit
-            })
-        }) // サーバ側のphpファイル
-        .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-        .then(data => {
-            console.log("更新に成功しました");
-        });
-        // db.collection("share_project").doc(project_id).set({
-        //     block_xml: myBlockXml,
-        //     code: code,
-        //     console_output: console_output,
-        //     project_name: project_name,
-        //     edit: edit
-        //   })
-        //   .then(()=>{
-        //     console.log("更新に成功しました");
-        //   })
-        //   .catch((error)=>{
-        //     console.log(`更新に失敗しました (${error})`);
-        //   });
-    }
+
     save = true;
 }
 
@@ -766,39 +735,7 @@ $("#filename").change(function() {
         var setjson = JSON.stringify(data);
         localStorage.setItem($("#filename").val(), setjson);
         project_name = $("#filename").val();
-        if (project_id) {
-            fetch('mysql.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    process:'set',
-                    id: project_id,
-                    block_xml: myBlockXml,
-                    code: code,
-                    console_output: console_output,
-                    project_name: project_name,
-                    edit: edit
-                })
-            }) // サーバ側のphpファイル
-            .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-            .then(data => {
-                console.log("更新に成功しました");
-            });
-            // db.collection("share_project").doc(project_id).set({
-            //     block_xml: myBlockXml,
-            //     code: code,
-            //     console_output: console_output,
-            //     project_name: project_name,
-            //     edit: edit
-            //   })
-            //   .then(()=>{
-            //     console.log("更新に成功しました");
-            //   })
-            //   .catch((error)=>{
-            //     console.log(`更新に失敗しました (${error})`);
-            //   });
 
-        }
         save = true;
         window.alert("名前を変更しました。")
     }
@@ -902,148 +839,7 @@ $(document).on('click', '#delete', function(){
     }
 });
 
-//--------------share dialog--------------
-$("#share").click(function() {
-    $("#share_dialog_background").css("display", "block");
-    if (project_id) {
-        // var docRef = db.collection("share_project").doc(project_id);
 
-        fetch('mysql.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                process:'get',
-                id:project_id
-            })
-        }) // サーバ側のphpファイル
-        .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-        .then(data => {
-            if (data) {
-                $("#link_create").css("display", "none");
-                $(".share_info").css("display", "block");
-                $(".link_field").text( location.protocol + "//" +  location.hostname + location.pathname + "?project=" + project_id)
-            } else {
-                $("#link_create").css("display", "block");
-                $(".share_info").css("display", "none");
-            }
-        });
-        // docRef.get().then((doc)=>{
-        //     if (doc.exists) {
-        //         $("#link_create").css("display", "none");
-        //         $(".share_info").css("display", "block");
-        //         $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + project_id)
-        //     } else {
-        //         $("#link_create").css("display", "block");
-        //         $(".share_info").css("display", "none");
-        //     }
-        // })
-    } else {
-        $("#link_create").css("display", "block");
-        $(".share_info").css("display", "none");
-    }
-})
-$("#create_link_btn").click(function() {
-    var xml = Blockly.Xml.workspaceToDom(workspace);
-    var myBlockXml = Blockly.Xml.domToText(xml);
-    // console.log(myBlockXml);
-    var code = editor.getValue();
-    var console_output = output_eval.getValue();
-    fetch('mysql.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            process:'add',
-            block_xml: myBlockXml,
-            code: code,
-            console_output: console_output,
-            project_name: project_name,
-        })
-    }) // サーバ側のphpファイル
-    .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-    .then(data => {
-    // db.collection("share_project").add({
-    //     block_xml: myBlockXml,
-    //     code: code,
-    //     console_output: console_output,
-    //     project_name: project_name,
-    //     edit: edit
-    // })
-    // .then((doc) => {
-    //     project_id = doc.id
-        project_id = data.id;
-        $("#link_create").css("display", "none");
-        $(".share_info").css("display", "block");
-        $(".link_field").text( location.protocol + "//" +  location.hostname + location.pathname + "?project=" + project_id)
-
-        var xml = Blockly.Xml.workspaceToDom(workspace);
-        var myBlockXml = Blockly.Xml.domToText(xml);
-        var code = editor.getValue();
-        var console_output = output_eval.getValue();
-        var data = {
-            "block_xml": myBlockXml,
-            "code": code,
-            "console_output": console_output,
-            "project_id": project_id,
-            "timestamp": new Date(),
-            "settings": {
-                "auto_save": $("#auto_save").prop('checked'),
-                "auto_generate_code": $("#auto_code_create").prop('checked'),
-                "turbo_mode": $("#turbo_mode").prop('checked'),
-            }
-        };
-        var setjson = JSON.stringify(data);
-        localStorage.setItem($("#filename").val(), setjson);
-    })
-    // .catch((error) => {
-    //     alert(`共有設定をできませんでした (${error})`);
-    // });
-})
-$("#link_copy").click(function() {
-    text = $(".link_field").text()
-    if (navigator.clipboard == undefined) {
-        window.clipboardData.setData("Text", text);
-    } else {
-        navigator.clipboard.writeText(text);
-    }
-})
-$("#ok").click(function() {
-    $("#share_dialog_background").css("display", "none");
-    var xml = Blockly.Xml.workspaceToDom(workspace);
-    var myBlockXml = Blockly.Xml.domToText(xml);
-    // console.log(myBlockXml);
-    var code = editor.getValue();
-    var console_output = output_eval.getValue();
-    fetch('mysql.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            process:'set',
-            id: project_id,
-            block_xml: myBlockXml,
-            code: code,
-            console_output: console_output,
-            project_name: project_name,
-            edit: edit
-        })
-    }) // サーバ側のphpファイル
-    .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-    .then(data => {
-        console.log("更新に成功しました");
-    });
-    // db.collection("share_project").doc(project_id).set({
-    //     block_xml: myBlockXml,
-    //     code: code,
-    //     console_output: console_output,
-    //     project_name: project_name,
-    //     edit: edit
-    // })
-    // .then(()=>{
-    //     console.log("更新に成功しました");
-    // })
-    // .catch((error)=>{
-    //     console.log(`更新に失敗しました (${error})`);
-    // });
-})
 
 //--------------------------------------------------------------load process--------------------------------------------------------------------
 
@@ -1066,74 +862,9 @@ window.onload = function() {
         p_tag.append(label_tag);
         $("#file_lists").append(p_tag);
     }
-    project_id = getParam("projectId");
     projectname = getParam("projectName");
 
-    if (project_id) {
-        fetch('mysql.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                process:'get',
-                id:project_id
-            })
-        }) // サーバ側のphpファイル
-        .then(response => response.json()) // 返ってきたレスポンスをjsonで受け取って次のthenへ渡す
-        .then(data => {
-            console.log(data)
-        // })
-        // var docRef = db.collection("share_project").doc(project_id);
-
-        // docRef.get().then((doc)=>{
-            if (data) {//(doc.exists) {
-                // console.log( doc.data() );
-                // let result = doc.data();
-                let result = data;
-                const filename = result["project_name"];
-                // console.log(filename);
-
-                // console.log(result);
-                // console.log(result["block_xml"]);
-
-                var block_xml = result["block_xml"].replace(/\\/g, '');
-                var xml = Blockly.Xml.textToDom(block_xml);
-                workspace.clear();
-                // console.log(xml)
-                Blockly.Xml.domToWorkspace(xml, workspace);
-                $("#filename").val(filename);
-                project_name = $("#filename").val();
-                edit = result["edit"]
-                var doc = output_eval.getDoc();
-                doc.setValue(result["console_output"]);
-                var doc = editor.getDoc();
-                doc.setValue(result["code"]);
-
-                $("#file_lists").empty();
-                $("#open_dialog_background").css("display", "none");
-
-                let result_local = JSON.parse(localStorage.getItem(filename));
-                if (result_local) {
-                    $("#auto_save").prop('checked', result_local["settings"]["auto_save"])
-                    $("#auto_code_create").prop('checked', result_local["settings"]["auto_generate_code"])
-                    $("#turbo_mode").prop('checked', result_local["settings"]["turbo_mode"])
-                } else {
-                    $("#auto_save").prop('checked', true)
-                    $("#auto_code_create").prop('checked', true)
-                    $("#turbo_mode").prop('checked', false)
-                }
-                var urlSearchParams = new URLSearchParams(location.search)
-                urlSearchParams.set("projectName", project_name)
-                history.replaceState("", "", `?${urlSearchParams.toString()}`)
-                setTimeout(() => {welcome = false;}, 500);
-
-            } else {
-                console.log("404");
-            }
-        })
-        .catch( (error) => {
-            alert(`データを取得できませんでした (${error})`);
-        });
-    } else if (projectname) {
+    if (projectname) {
         let result = JSON.parse(localStorage.getItem(projectname));
         // console.log(result["settings"]["auto_save"]);
         // console.log(result["block_xml"]);
