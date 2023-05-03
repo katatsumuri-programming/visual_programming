@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+    web:
+        build: .
+        container_name: "php74-1"
+        volumes:
+            - "./app/:/var/www/html"
+        privileged: true
+        ports:
+            - "80:80"
+        depends_on:
+            - mysql
+    mysql:
+        image: mysql:8
+        volumes:
+            - ./mysql:/var/lib/mysql
+            - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./initdb.d:/docker-entrypoint-initdb.d
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=katacode
+            - MYSQL_USER=katacodeuser
+            - MYSQL_PASSWORD=katacodeuserpassword
+        ports:
+            - "4306:3306"
+        container_name: mysql8-1
