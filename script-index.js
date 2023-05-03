@@ -165,7 +165,7 @@ $(document).on("click",".new_file", function() {
       if (override) {
         project_name = filename;
         var data = {
-          "block_xml": "<xml><block type='startblock'></block></xml>",
+          "block_xml": "<xml><block type='start_block'></block></xml>",
           "code": "",
           "console_output": "",
           "project_id": null,
@@ -184,7 +184,7 @@ $(document).on("click",".new_file", function() {
     } else {
       project_name = filename;
       var data = {
-        "block_xml": "<xml><block type='startblock'></block></xml>",
+        "block_xml": "<xml><block type='start_block'></block></xml>",
         "code": "",
         "console_output": "",
         "project_id": null,
