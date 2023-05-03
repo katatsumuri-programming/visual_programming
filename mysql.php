@@ -1,13 +1,15 @@
 <?php
 $data = json_decode(file_get_contents("php://input"), true);
+$path = "./config.ini";
+$config = parse_ini_file($path, false);
 // 接続
-$link = mysqli_connect('localhost', 'testuser', 'kmRzqrHewN9U', 'visualprogramming');
+$link = mysqli_connect($config["HOST"], $config["USERNAME"], $config["PASSWORD"], $config["DATABASE"]);
 if (!$link) {
     echo "error";
     exit;
 }
 if ($data['process'] == 'set') {
-    $query = "UPDATE share_projects SET block_xml=?, code=?, console=?, project_name=? WHERE id=?";
+    $query = "UPDATE " . $config["TABLE"] . " SET block_xml=?, code=?, console=?, project_name=? WHERE id=?";
     $id = $data['id'];
     $block_xml = $data['block_xml'];
     $code = $data['code'];
@@ -19,7 +21,7 @@ if ($data['process'] == 'set') {
 
     echo json_encode(["success"]);
 } else if ($data['process'] == 'add') {
-    $query = "INSERT INTO share_projects VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO " . $config["TABLE"] . " VALUES (?, ?, ?, ?, ?)";
     $id = preg_replace_callback(
         '/x|y/',
         function($m) {
@@ -37,7 +39,7 @@ if ($data['process'] == 'set') {
 
     echo json_encode(["id" => $id]);
 } else if ($data['process'] == 'get') {
-    $query = "SELECT * FROM share_projects WHERE id=?";
+    $query = "SELECT * FROM " . $config["TABLE"] . " WHERE id=?";
 
     $stmt  = mysqli_prepare($link, $query);
     mysqli_stmt_bind_param( $stmt, 's', $data['id']);
