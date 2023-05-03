@@ -84,11 +84,7 @@ function new_file() {
                 $("#open_dialog_background").css("display", "none");
                 $("#file_lists").empty();
                 var urlSearchParams = new URLSearchParams(location.search)
-                if (project_id) {
-                    urlSearchParams.set("projectId", project_id)
-                } else {
-                    urlSearchParams.delete("projectId")
-                }
+                urlSearchParams.delete("projectId")
                 urlSearchParams.set("projectName", project_name)
                 history.replaceState("", "", `?${urlSearchParams.toString()}`)
             }
@@ -126,11 +122,7 @@ function new_file() {
             $("#open_dialog_background").css("display", "none");
             $("#file_lists").empty();
             var urlSearchParams = new URLSearchParams(location.search)
-            if (project_id) {
-                urlSearchParams.set("projectId", project_id)
-            } else {
-                urlSearchParams.delete("projectId")
-            }
+            urlSearchParams.delete("projectId")
             urlSearchParams.set("projectName", project_name)
             history.replaceState("", "", `?${urlSearchParams.toString()}`)
         }
@@ -644,11 +636,7 @@ $("#load_computer").click(function () {
                 $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
                 $("#turbo_mode").prop('checked', result["settings"]["turbo_mode"])
                 var urlSearchParams = new URLSearchParams(location.search)
-                if (project_id) {
-                    urlSearchParams.set("projectId", project_id)
-                } else {
-                    urlSearchParams.delete("projectId")
-                }
+                urlSearchParams.delete("projectId")
                 urlSearchParams.set("projectName", project_name)
                 history.replaceState("", "", `?${urlSearchParams.toString()}`)
             };
@@ -787,11 +775,7 @@ $("#open").click(function() {
         $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
         $("#turbo_mode").prop('checked', result["settings"]["turbo_mode"])
         var urlSearchParams = new URLSearchParams(location.search)
-        if (project_id) {
-            urlSearchParams.set("projectId", project_id)
-        } else {
-            urlSearchParams.delete("projectId")
-        }
+        urlSearchParams.delete("projectId")
         urlSearchParams.set("projectName", project_name)
         history.replaceState("", "", `?${urlSearchParams.toString()}`)
     }
@@ -882,11 +866,7 @@ window.onload = function() {
         $("#auto_code_create").prop('checked', result["settings"]["auto_generate_code"])
         $("#turbo_mode").prop('checked', result["settings"]["turbo_mode"])
         var urlSearchParams = new URLSearchParams(location.search)
-        if (project_id) {
-            urlSearchParams.set("projectId", project_id)
-        } else {
-            urlSearchParams.delete("projectId")
-        }
+        urlSearchParams.delete("projectId")
         urlSearchParams.set("projectName", project_name)
         history.replaceState("", "", `?${urlSearchParams.toString()}`);
         $("#file_lists").empty();
