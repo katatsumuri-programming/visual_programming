@@ -59,7 +59,7 @@ function new_file() {
                 doc.setValue("");
                 workspace.clear();
                 project_name = filename;
-                var dom = (new DOMParser()).parseFromString("<xml><block type='startblock'></block></xml>", "application/xml").documentElement;
+                var dom = (new DOMParser()).parseFromString("<xml><block type='start_block'></block></xml>", "application/xml").documentElement;
                 Blockly.Xml.appendDomToWorkspace(dom, workspace)
                 var xml = Blockly.Xml.workspaceToDom(workspace);
                 var myBlockXml = Blockly.Xml.domToText(xml);
@@ -101,7 +101,7 @@ function new_file() {
             doc.setValue("");
             workspace.clear();
             project_name = filename;
-            var dom = (new DOMParser()).parseFromString("<xml><block type='startblock'></block></xml>", "application/xml").documentElement;
+            var dom = (new DOMParser()).parseFromString("<xml><block type='start_block'></block></xml>", "application/xml").documentElement;
             Blockly.Xml.appendDomToWorkspace(dom, workspace)
             var xml = Blockly.Xml.workspaceToDom(workspace);
             var myBlockXml = Blockly.Xml.domToText(xml);
@@ -921,7 +921,7 @@ $("#share").click(function() {
             if (data) {
                 $("#link_create").css("display", "none");
                 $(".share_info").css("display", "block");
-                $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + project_id)
+                $(".link_field").text( location.protocol + "//" +  location.hostname + location.pathname + "?project=" + project_id)
             } else {
                 $("#link_create").css("display", "block");
                 $(".share_info").css("display", "none");
@@ -973,7 +973,7 @@ $("#create_link_btn").click(function() {
         project_id = data.id;
         $("#link_create").css("display", "none");
         $(".share_info").css("display", "block");
-        $(".link_field").text("https://katatsumuri-programming.github.io/visual_programming/?project=" + project_id)
+        $(".link_field").text( location.protocol + "//" +  location.hostname + location.pathname + "?project=" + project_id)
 
         var xml = Blockly.Xml.workspaceToDom(workspace);
         var myBlockXml = Blockly.Xml.domToText(xml);
