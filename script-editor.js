@@ -11,7 +11,6 @@ $("#auto_save").prop('checked', false)
 // var code_block_generate = false;
 $("#open_dialog_background").css("display", "none");
 $("#error_dialog_background").css("display", "none");
-$("#share_dialog_background").css("display", "none");
 Blockly.HSV_SATURATION = 0.9;
 Blockly.HSV_VALUE = 0.7;
 Blockly.Flyout.prototype.autoClose=false;
