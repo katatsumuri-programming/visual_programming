@@ -1,0 +1,146 @@
+:root {
+    --main-color: orange;
+    --background-color: black;
+}
+@font-face {
+	font-family: 'misaki_gothic';
+	src: url(misaki_gothic.ttf);
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-color);
+}
+
+header {
+    display: flex;
+    height: 50px;
+    position: fixed;
+    width: 100%;
+    z-index: 2;
+    background-color: var(--background-color);
+    box-shadow: 0 0 50px 40px var(--background-color);
+}
+.header-div {
+    display: flex;
+    width: fit-content;
+    margin: 0 auto;
+}
+.header-icon {
+    margin: 10px;
+    height: 30px;
+}
+nav {
+    margin-left: 50px;
+}
+nav ul {
+    height: 30px;
+    margin: 10;
+    padding: 0;
+    font-size:0;
+}
+nav ul li {
+    list-style: none;
+    display: inline-block;
+
+    border-left: solid 1px var(--main-color);
+}
+a {
+    user-select: none;
+    text-decoration: none;
+}
+a p {
+    width: 150px;
+    line-height: 30px;
+    height: 30px;
+    margin: 0;
+    color: var(--main-color);
+    font-family: "misaki_gothic";
+    font-size: 21px;
+    text-align: center;
+
+}
+nav ul li:first-child {
+    border: none;
+}
+.wrapper {
+    position: absolute;
+    overflow: hidden;
+    display: table;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+
+}
+#scene, .layer {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+.layer_img {
+    background-size: cover;
+    background-position: center;
+    width: 110%;
+    position: absolute;
+    bottom: -5%;
+    left: -5%;
+    top: -5%;
+    filter: drop-shadow(0 0 10px var(--background-color));
+}
+.img1 {
+    background-image: url(01.png);
+}
+.img2 {
+    background-image: url(02.png);
+}
+.img3 {
+    background-image: url(katacode_title.png);
+    background-repeat: no-repeat;
+    background-size: 60%;
+    filter: drop-shadow(0 0 50px var(--main-color));
+}
+.img4 {
+    background-image: url(04.png);
+    bottom: -10%;
+}
+.wrapper-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    box-shadow: 0 0 100px 100px var(--background-color) inset;
+}
+.section_top {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.link_tile h2 {
+    color: var(--main-color);
+}
+.link {
+    display: flex;
+    width: 100%;
+    position: absolute;
+    bottom: 10%;
+    z-index: 3;
+}
+.link_tile {
+    width: calc(20% - 4px);
+    margin: 0 6.66%;
+    text-align: center;
+    border: 2px solid var(--main-color);
+    transition: all 0.5s;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--background-color), 0 0 20px var(--background-color) inset;
+    text-shadow: 0 0 20px var(--background-color);
+    font-family: "misaki_gothic";
+}
+.link_tile:hover {
+    box-shadow: 0 0 20px var(--main-color), 0 0 20px var(--main-color) inset;
+    text-shadow: 0 0 20px var(--main-color);
+}
